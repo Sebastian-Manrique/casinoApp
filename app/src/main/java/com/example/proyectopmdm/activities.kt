@@ -1,16 +1,17 @@
 package com.example.proyectopmdm
 
-import android.media.Image
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -21,15 +22,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun LogIn() {
+fun LogIn(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,7 +87,9 @@ fun LogIn() {
         Spacer(modifier = Modifier.height(30.dp))
 
         Button(onClick = {
-
+            navController.navigate("home") {
+                popUpTo("logIn") { inclusive = true } // Borra la pantalla "logIn" de la pila
+            }
         }) {
             Text(text = "Log in")
         }
@@ -95,8 +100,9 @@ fun LogIn() {
 
         Spacer(modifier = Modifier.height(10.dp))
 
+        val context = LocalContext.current  // Obtiene el contexto actual
         Button(onClick = {
-            println("READY!")
+            Toast.makeText(context, "¡Hola desde el Toast!", Toast.LENGTH_SHORT).show()
         }) {
             Text(text = "Create one")
         }
@@ -105,27 +111,36 @@ fun LogIn() {
 }
 
 @Composable
-fun Home() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
+fun Home(navController: NavHostController) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        Text(text = "BOOB")
+        item { Text("test  proof") }
+        item { Text("test  proof") }
+        item { Text("test  proof") }
+        item { Text("test  proof") }
+        item { Text("test  proof") }
+        item { Text("test  proof") }
+        item { Text("test  proof") }
+        item { Text("test  proof") }
+        item { Text("test  proof") }
+        item { Text("test  proof") }
+        item { Text("test  proof") }
     }
 }
 
 @Preview
 @Composable
 fun PreviewHome() {
-    Home()
+    val navController = rememberNavController()
+    Home(navController)
 }
 
-@Preview
 @Composable
 fun PreviewLogIn() {
-    LogIn()
+    val navController = rememberNavController()
+    LogIn(navController)
 }
