@@ -20,13 +20,15 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = "logIn"
+                    startDestination = Routes.LOGIN
                 ) {
-                    composable("home") { Home(navController) }
-                    composable("logIn") { LogIn(navController) }
+                    composable(Routes.HOME) { Home(navController) }
+                    composable(Routes.LOGIN) { LogIn(navController) }
+                    composable(Routes.ROULETTE) { Roulette(navController) }
+                    composable(Routes.PRIZES) { Prizes(navController) }
+                    composable(Routes.DICE) { Dice(navController) }
+                    composable(Routes.ME) { AboutMe(navController) }
                 }
-
-                LogIn(navController)
             }
         }
     }

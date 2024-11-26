@@ -2,7 +2,9 @@ package com.example.proyectopmdm
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -87,12 +90,11 @@ fun LogIn(navController: NavHostController) {
         Spacer(modifier = Modifier.height(30.dp))
 
         Button(onClick = {
-            navController.navigate("home") {
-                popUpTo("logIn") { inclusive = true } // Borra la pantalla "logIn" de la pila
-            }
+            navController.navigate(Routes.HOME)
         }) {
             Text(text = "Log in")
         }
+
 
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -113,34 +115,245 @@ fun LogIn(navController: NavHostController) {
 @Composable
 fun Home(navController: NavHostController) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        content = {
+            item {
+                Box(modifier = Modifier) {
+                    Row {
+                        Text(
+                            "Last transaction\n" +
+                                    "Usuario: John Doe\n" +
+                                    "Lugar: Ruleta\n" +
+                                    "Introducido: 20€\n" +
+                                    "Ganancia: +20€"
+                        )
 
+                    }
+                }
+            }
+        })
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-        item { Text("test  proof") }
-        item { Text("test  proof") }
-        item { Text("test  proof") }
-        item { Text("test  proof") }
-        item { Text("test  proof") }
-        item { Text("test  proof") }
-        item { Text("test  proof") }
-        item { Text("test  proof") }
-        item { Text("test  proof") }
-        item { Text("test  proof") }
-        item { Text("test  proof") }
+
+        Spacer(modifier = Modifier.weight(1f)) // Empuja todo hacia arriba
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Gray) // Opcional: para destacar el Row
+                .align(Alignment.CenterHorizontally) // Alinear dentro del Column
+        ) {
+            Button(onClick = {
+                navController.navigate(Routes.HOME)
+            }) {
+                Text(text = "🏠")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.ROULETTE)
+            }) {
+                Text(text = "🎰")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.DICE)
+            }) {
+                Text(text = "🎲")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.PRIZES)
+            }) {
+                Text(text = "🏅")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.ME)
+            }) {
+                Text(text = "👤")
+            }
+        }
     }
 }
+
+@Composable
+fun Roulette(navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+
+        Spacer(modifier = Modifier.weight(1f)) // Empuja todo hacia arriba
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Gray) // Opcional: para destacar el Row
+                .align(Alignment.CenterHorizontally) // Alinear dentro del Column
+        ) {
+            Button(onClick = {
+                navController.navigate(Routes.HOME)
+            }) {
+                Text(text = "🏠")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.ROULETTE)
+            }) {
+                Text(text = "🎰")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.DICE)
+            }) {
+                Text(text = "🎲")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.PRIZES)
+            }) {
+                Text(text = "🏅")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.ME)
+            }) {
+                Text(text = "👤")
+            }
+        }
+    }
+}
+
+@Composable
+fun Dice(navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+
+        Spacer(modifier = Modifier.weight(1f)) // Empuja todo hacia arriba
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Gray) // Opcional: para destacar el Row
+                .align(Alignment.CenterHorizontally) // Alinear dentro del Column
+        ) {
+            Button(onClick = {
+                navController.navigate(Routes.HOME)
+            }) {
+                Text(text = "🏠")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.ROULETTE)
+            }) {
+                Text(text = "🎰")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.DICE)
+            }) {
+                Text(text = "🎲")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.PRIZES)
+            }) {
+                Text(text = "🏅")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.ME)
+            }) {
+                Text(text = "👤")
+            }
+        }
+    }
+}
+
+@Composable
+fun Prizes(navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+
+        Spacer(modifier = Modifier.weight(1f)) // Empuja todo hacia arriba
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Gray) // Opcional: para destacar el Row
+                .align(Alignment.CenterHorizontally) // Alinear dentro del Column
+        ) {
+            Button(onClick = {
+                navController.navigate(Routes.HOME)
+            }) {
+                Text(text = "🏠")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.ROULETTE)
+            }) {
+                Text(text = "🎰")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.DICE)
+            }) {
+                Text(text = "🎲")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.PRIZES)
+            }) {
+                Text(text = "🏅")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.ME)
+            }) {
+                Text(text = "👤")
+            }
+        }
+    }
+}
+
+@Composable
+fun AboutMe(navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+
+        Spacer(modifier = Modifier.weight(1f)) // Empuja todo hacia arriba
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Gray) // Opcional: para destacar el Row
+                .align(Alignment.CenterHorizontally) // Alinear dentro del Column
+        ) {
+            Button(onClick = {
+                navController.navigate(Routes.HOME)
+            }) {
+                Text(text = "🏠")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.ROULETTE)
+            }) {
+                Text(text = "🎰")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.DICE)
+            }) {
+                Text(text = "🎲")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.PRIZES)
+            }) {
+                Text(text = "🏅")
+            }
+            Button(onClick = {
+                navController.navigate(Routes.ME)
+            }) {
+                Text(text = "👤")
+            }
+        }
+    }
+}
+
 
 @Preview
 @Composable
 fun PreviewHome() {
     val navController = rememberNavController()
     Home(navController)
-}
-
-@Composable
-fun PreviewLogIn() {
-    val navController = rememberNavController()
-    LogIn(navController)
 }
