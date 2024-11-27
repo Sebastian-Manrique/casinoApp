@@ -7,4 +7,5 @@ object Routes {
     const val DICE = "dice"
     const val PRIZES= "prizes"
     const val ME = "aboutMe"
+    const val CREATEUSER = "createUser"
 }

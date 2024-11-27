@@ -47,7 +47,11 @@ fun Home(navController: NavHostController) {
         item {
             Spacer(modifier = Modifier.height(20.dp))
             Column {
-                Text("Main statistics", fontSize = 30.sp, modifier = Modifier.align(alignment = Alignment.CenterHorizontally))
+                Text(
+                    "Main statistics",
+                    fontSize = 30.sp,
+                    modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                )
                 Text("$money€", fontSize = 100.sp)
             }
         }
@@ -105,17 +109,6 @@ fun Home(navController: NavHostController) {
                             .align(alignment = Alignment.CenterHorizontally)
                     )
                 }
-            }
-        }
-        item {
-            Column {
-                Image(
-                    painter = painterResource(id = R.drawable.ourclients),
-                    contentDescription = "Never surrender, you're too close to win.",
-                    modifier = Modifier
-                        .size(300.dp)
-                        .align(alignment = Alignment.CenterHorizontally)
-                )
             }
         }
     }
