@@ -7,6 +7,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.proyectopmdm.screens.AboutMe
+import com.example.proyectopmdm.screens.CreateUser
+import com.example.proyectopmdm.screens.Dice
+import com.example.proyectopmdm.screens.Home
+import com.example.proyectopmdm.screens.LogIn
+import com.example.proyectopmdm.screens.Prizes
+import com.example.proyectopmdm.screens.Roulette
 import com.example.proyectopmdm.ui.theme.ProyectoPMDMTheme
 
 class MainActivity : ComponentActivity() {
@@ -28,6 +35,7 @@ class MainActivity : ComponentActivity() {
                     composable(Routes.PRIZES) { Prizes(navController) }
                     composable(Routes.DICE) { Dice(navController) }
                     composable(Routes.ME) { AboutMe(navController) }
+                    composable(Routes.CREATEUSER) { CreateUser(navController) }
                 }
             }
         }
