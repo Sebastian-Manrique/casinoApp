@@ -49,8 +49,8 @@ class MainActivity : ComponentActivity() {
                         AnimatedBottomBar(
                             selectedItem = navigationItems.indexOfFirst { it.route == currentRoute },
                             itemSize = navigationItems.size,
-                            containerColor = Color.LightGray,
-                            indicatorStyle = IndicatorStyle.DOT,
+                            containerColor = Color.Black,
+                            indicatorStyle = IndicatorStyle.LINE,
                         ) {
                             navigationItems.forEachIndexed { index, navigationItem ->
                                 BottomBarItem(
