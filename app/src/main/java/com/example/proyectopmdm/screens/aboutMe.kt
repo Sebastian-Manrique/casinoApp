@@ -26,7 +26,7 @@ import com.example.proyectopmdm.Routes
 
 @Composable
 fun AboutMe(navController: NavHostController) {
-    var user = "Sebas"
+    val user = "Sebas"
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -40,7 +40,6 @@ fun AboutMe(navController: NavHostController) {
         flingBehavior = ScrollableDefaults.flingBehavior(),
         userScrollEnabled = true
     ) {
-        var user = "Sebas"
         item {
             Box(
                 modifier = Modifier
@@ -68,20 +67,4 @@ fun AboutMe(navController: NavHostController) {
             }
         }
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Spacer(modifier = Modifier.height(750.dp)) // Empuja todo hacia arriba
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Gray) // Opcional: para destacar el Row
-                .align(Alignment.CenterHorizontally) // Alinear dentro del Column
-        ) {
-            barButtons(navController)
-        }
-    }
-
 }

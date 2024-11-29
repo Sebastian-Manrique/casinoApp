@@ -1,31 +1,29 @@
 package com.example.proyectopmdm
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.*
 import com.example.proyectopmdm.screens.*
 import com.example.proyectopmdm.ui.theme.ProyectoPMDMTheme
 import com.example.bottombar.AnimatedBottomBar
 import com.example.bottombar.components.BottomBarItem
 import com.example.bottombar.model.IndicatorStyle
-import java.lang.reflect.Modifier
 
 class MainActivity : ComponentActivity() {
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -40,7 +38,7 @@ class MainActivity : ComponentActivity() {
                     NavigationItem("Home", Routes.HOME, Icons.Default.Home),
                     NavigationItem("Roulette", Routes.ROULETTE, Icons.Default.Warning),
                     NavigationItem("Prizes", Routes.PRIZES, Icons.Default.Star),
-                    NavigationItem("Dice", Routes.DICE, Icons.Default.Star),
+                    NavigationItem("Dice", Routes.DICE, Icons.Default.Email),
                     NavigationItem("About Me", Routes.ME, Icons.Default.Person)
                 )
 
@@ -52,7 +50,7 @@ class MainActivity : ComponentActivity() {
                             containerColor = Color.Black,
                             indicatorStyle = IndicatorStyle.LINE,
                         ) {
-                            navigationItems.forEachIndexed { index, navigationItem ->
+                            navigationItems.forEachIndexed { _, navigationItem ->
                                 BottomBarItem(
                                     selected = currentRoute == navigationItem.route,
                                     onClick = {
@@ -76,7 +74,8 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = Routes.LOGIN
+                        startDestination = Routes.LOGIN,
+                        modifier = Modifier.padding(innerPadding)
                     ) {
                         composable(Routes.HOME) { Home(navController) }
                         composable(Routes.LOGIN) { LogIn(navController) }
@@ -84,7 +83,7 @@ class MainActivity : ComponentActivity() {
                         composable(Routes.PRIZES) { Prizes(navController) }
                         composable(Routes.DICE) { Dice(navController) }
                         composable(Routes.ME) { AboutMe(navController) }
-                        composable(Routes.CREATEUSER) { CreateUser(navController) }
+                        composable(Routes.CREATEJS) { CreateUser(navController) }
                     }
                 }
             }

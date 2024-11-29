@@ -23,17 +23,8 @@ fun Dice(navController: NavHostController) {
         modifier = Modifier
             .fillMaxSize()
     ) {
+        Spacer(modifier = Modifier.height(350.dp))
+
         Text("Currently working on dice")
-
-        Spacer(modifier = Modifier.height(750.dp)) // Empuja todo hacia arriba
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Gray) // Opcional: para destacar el Row
-                .align(Alignment.CenterHorizontally) // Alinear dentro del Column
-        ) {
-            barButtons(navController)
-        }
     }
 }

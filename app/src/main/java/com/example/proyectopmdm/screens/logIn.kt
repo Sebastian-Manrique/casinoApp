@@ -1,6 +1,5 @@
 package com.example.proyectopmdm.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -101,7 +100,7 @@ fun LogIn(navController: NavHostController) {
 
         val context = LocalContext.current  // Obtiene el contexto actual
         Button(onClick = {
-            navController.navigate(Routes.CREATEUSER)
+            navController.navigate(Routes.CREATEJS)
         }) {
             Text(text = "Create one")
         }

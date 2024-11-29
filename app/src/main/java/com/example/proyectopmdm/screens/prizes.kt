@@ -23,17 +23,7 @@ fun Prizes(navController: NavHostController) {
         modifier = Modifier
             .fillMaxSize()
     ) {
+        Spacer(modifier = Modifier.height(300.dp)) // Empuja todo hacia arriba
         Text("Currently working on prizes")
-
-        Spacer(modifier = Modifier.height(750.dp)) // Empuja todo hacia arriba
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Gray) // Opcional: para destacar el Row
-                .align(Alignment.CenterHorizontally) // Alinear dentro del Column
-        ) {
-            barButtons(navController)
-        }
     }
 }
