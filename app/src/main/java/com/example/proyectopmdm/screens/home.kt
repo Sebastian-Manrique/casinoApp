@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.proyectopmdm.R
 
+var money = 100.00
+
 @Composable
 fun Home(navController: NavHostController) {
     LazyColumn(
@@ -43,7 +45,7 @@ fun Home(navController: NavHostController) {
         flingBehavior = ScrollableDefaults.flingBehavior(),
         userScrollEnabled = true
     ) {
-        var money = 100.00
+
         item {
             Spacer(modifier = Modifier.height(20.dp))
             Column {
