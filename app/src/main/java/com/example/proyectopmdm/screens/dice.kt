@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -33,9 +34,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,6 +53,7 @@ fun Dice(navController: NavHostController) {
     var resultNumber by remember { mutableIntStateOf(0) }
     val list = remember { mutableStateListOf<Int>() }
     var isExpanded by remember { mutableStateOf(false) } // The box is open or not
+    var betNumber by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -62,7 +67,9 @@ fun Dice(navController: NavHostController) {
 
         Spacer(Modifier.height(10.dp))
 
-        GamblingNumbersGrid()
+        GamblingNumbersGrid(betNumber = betNumber) { newBetNumber ->
+            betNumber = newBetNumber
+        }
 
         Spacer(Modifier.height(10.dp))
 
@@ -71,11 +78,17 @@ fun Dice(navController: NavHostController) {
         Spacer(Modifier.height(10.dp))
 
         var text2 by remember { mutableStateOf("") } // Holds the input text
+        val keyboardController = LocalSoftwareKeyboardController.current
         TextField(
             value = text2, // The current money value
             onValueChange = { newText -> text2 = newText }, // Update text when changed
             label = { Text("Enter the amount") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { keyboardController?.hide() })
         )
         Spacer(Modifier.height(5.dp))
 
@@ -86,7 +99,7 @@ fun Dice(navController: NavHostController) {
         Button(
             onClick = {
                 resultNumber = randomGenerator(list)
-
+                println("Cantidad apostada: $text2, numero elegido: $betNumber")
             },
             //No se puede simplificar el color.
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF379ca0))
@@ -132,13 +145,22 @@ fun Dice(navController: NavHostController) {
                             .padding(top = 16.dp)
                     ) {
                         items(list) { item ->
-                            Text(
-                                text = "Rolled: $item",
-                                modifier = Modifier.padding(8.dp),
-                                textAlign = TextAlign.Center
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth() // Aseguramos que el Box ocupe todo el ancho disponible
+                                    .padding(8.dp),
+                                contentAlignment = Alignment.Center // Centrar el texto dentro del Box
+                            ) {
+                                Text(
+                                    text = "Rolled: $item",
+                                    modifier = Modifier.align(Alignment.CenterHorizontally), // Centrar el texto
+                                    textAlign = TextAlign.Center, // Alinear el texto dentro del Text
+                                    fontSize = 16.sp
+                                )
+                            }
                         }
                     }
+
                 }
             }
         }
@@ -154,13 +176,14 @@ fun Ver() {
 }
 
 @Composable
-fun GamblingNumbersGrid() {
+fun GamblingNumbersGrid(betNumber: Int, onBetNumberChange: (Int) -> Unit) {
     // Crear un estado mutable para almacenar los colores de fondo de cada celda
     val colors = remember {
         mutableStateListOf<Color>().apply {
             repeat(12) { add(if (it % 2 == 0) Color.Red else Color.Black) }
         }
     }
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(6), // 6 columnas
         modifier = Modifier
@@ -174,26 +197,36 @@ fun GamblingNumbersGrid() {
                     .size(100.dp) // Tamaño de cada celda
                     .background(colors[index]) // Usar el color específico para cada celda
                     .clickable {
-                        colors[index] =
-                            if (colors[index] == Color.Red || colors[index] == Color.Black) {
-                                Color(0xFF262e2c) // Negro apagado
-                            } else {
-                                if (index % 2 == 0) Color.Red else Color.Black // Restaurar al color original
-                            }
-                        println("El número seleccionado es ${index + 1}")
+                        handleCellClick(index, colors) { newBet ->
+                            onBetNumberChange(newBet) // Notificar el cambio al componente padre
+                        }
                     },
+                contentAlignment = Alignment.Center
             ) {
                 Text(
-                    "${index + 1}",
+                    text = "${index + 1}",
                     color = Color.White,
-                    fontSize = 20.sp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(alignment = Alignment.Center)
+                    fontSize = 20.sp
                 )
             }
         }
     }
+}
+
+
+// Función para manejar el clic de una celda
+private fun handleCellClick(
+    index: Int,
+    colors: SnapshotStateList<Color>,
+    updateBetNumber: (Int) -> Unit
+) {
+    colors[index] = if (colors[index] == Color.Red || colors[index] == Color.Black) {
+        Color(0xFF9c9c9c) // Negro apagado
+    } else {
+        if (index % 2 == 0) Color.Red else Color.Black // Restaurar al color original
+    }
+    updateBetNumber(index + 1) // Actualizar el número seleccionado
+    println("El número seleccionado es ${index + 1}")
 }
 
 
