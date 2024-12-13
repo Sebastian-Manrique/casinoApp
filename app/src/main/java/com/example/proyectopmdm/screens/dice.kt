@@ -1,5 +1,7 @@
 package com.example.proyectopmdm.screens
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,10 +36,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -63,6 +65,8 @@ fun Dice(navController: NavHostController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val context = LocalContext.current
+
         Text("Choose your lucky number \uD83C\uDF40", fontSize = 20.sp)
 
         Spacer(Modifier.height(10.dp))
@@ -77,29 +81,33 @@ fun Dice(navController: NavHostController) {
 
         Spacer(Modifier.height(10.dp))
 
-        var text2 by remember { mutableStateOf("") } // Holds the input text
+        var moneyBet by remember { mutableStateOf("") } // Holds the input text
         val keyboardController = LocalSoftwareKeyboardController.current
         TextField(
-            value = text2, // The current money value
-            onValueChange = { newText -> text2 = newText }, // Update text when changed
-            label = { Text("Enter the amount") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = { keyboardController?.hide() })
+            value = moneyBet, // The current money value
+            onValueChange = { newText -> moneyBet = newText }, // Update text when changed
+            label = { Text("Enter the amount") }, keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number, imeAction = ImeAction.Done
+            ), keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
         )
         Spacer(Modifier.height(5.dp))
 
-        Text("Currently money $money€", fontSize = 17.sp)
+        Text("Currently money %.2f€".format(money), fontSize = 17.sp)
 
         Spacer(Modifier.height(5.dp))
 
         Button(
             onClick = {
-                resultNumber = randomGenerator(list)
-                println("Cantidad apostada: $text2, numero elegido: $betNumber")
+                println("Cantidad apostada: $moneyBet, numero elegido: $betNumber")
+                if (betNumber == 0) {
+                    Toast.makeText(context, "You didn't select any number!", Toast.LENGTH_SHORT)
+                        .show()
+                } else if (moneyBet.isEmpty()) {
+                    Toast.makeText(context, "You didn't bet any money!", Toast.LENGTH_SHORT).show()
+                } else {
+                    resultNumber = randomGenerator(list)
+                    betFun(betNumber, resultNumber, moneyBet, context)
+                }
             },
             //No se puede simplificar el color.
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF379ca0))
@@ -120,19 +128,14 @@ fun Dice(navController: NavHostController) {
             tileMode = TileMode.Repeated
         )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .border(
-                    width = 2.dp,
-                    brush = gradientBrush,
-                    shape = CircleShape
-                )
-                .clickable { isExpanded = !isExpanded } // Alterna la expansión al hacer clic
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .border(
+                width = 2.dp, brush = gradientBrush, shape = CircleShape
+            )
+            .clickable { isExpanded = !isExpanded } // Alterna la expansión al hacer clic
+            .padding(16.dp), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = if (isExpanded) "Hide Results" else "Show Results",
@@ -153,7 +156,7 @@ fun Dice(navController: NavHostController) {
                             ) {
                                 Text(
                                     text = "Rolled: $item",
-                                    modifier = Modifier.align(Alignment.CenterHorizontally), // Centrar el texto
+                                    // modifier = Modifier.align(Alignment.CenterHorizontally), // Centrar el texto
                                     textAlign = TextAlign.Center, // Alinear el texto dentro del Text
                                     fontSize = 16.sp
                                 )
@@ -164,6 +167,20 @@ fun Dice(navController: NavHostController) {
                 }
             }
         }
+    }
+}
+
+fun betFun(betNumber: Int, resultNumber: Int, moneyBet: String, context: Context) {
+    if (moneyBet.toDouble() > money) {
+        Toast.makeText(context, "Liar, you don't have that money!", Toast.LENGTH_SHORT).show()
+    } else if (betNumber == resultNumber) {
+        println("betNumber == $betNumber, resultNumber == $resultNumber")
+        if (moneyBet.toDouble() <= money) {
+            Toast.makeText(context, "You just earn money!! 💲🤑💸", Toast.LENGTH_SHORT).show()
+            money += moneyBet.toDouble() * 2
+        }
+    } else {
+        money -= moneyBet.toDouble()
     }
 }
 
@@ -200,25 +217,47 @@ fun GamblingNumbersGrid(betNumber: Int, onBetNumberChange: (Int) -> Unit) {
                         handleCellClick(index, colors) { newBet ->
                             onBetNumberChange(newBet) // Notificar el cambio al componente padre
                         }
-                    },
-                contentAlignment = Alignment.Center
+                    }, contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "${index + 1}",
-                    color = Color.White,
-                    fontSize = 20.sp
+                    text = "${index + 1}", color = Color.White, fontSize = 20.sp
                 )
             }
         }
+        item {
+            Box(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .size(100.dp) // Tamaño de cada celda
+                    .background(Color.Black) // Usar el color específico para cada celda
+                    .clickable {
+                        println("betting on black!")
+                    }, contentAlignment = Alignment.Center
+            ) {
+                Text("")
+            }
+        }
+        item {
+            Box(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .size(100.dp) // Tamaño de cada celda
+                    .background(Color.Red) // Usar el color específico para cada celda
+                    .clickable {
+                        println("betting on red!")
+                    }, contentAlignment = Alignment.Center
+            ) {
+                Text("")
+            }
+        }
     }
+
 }
 
 
 // Función para manejar el clic de una celda
 private fun handleCellClick(
-    index: Int,
-    colors: SnapshotStateList<Color>,
-    updateBetNumber: (Int) -> Unit
+    index: Int, colors: SnapshotStateList<Color>, updateBetNumber: (Int) -> Unit
 ) {
     colors[index] = if (colors[index] == Color.Red || colors[index] == Color.Black) {
         Color(0xFF9c9c9c) // Negro apagado
