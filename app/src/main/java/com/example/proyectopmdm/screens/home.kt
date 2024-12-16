@@ -19,6 +19,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,7 +32,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.proyectopmdm.R
 
-var money = 100.00
+
+var money by mutableDoubleStateOf(100.00)
+
 
 @Composable
 fun Home(navController: NavHostController) {
@@ -48,13 +54,13 @@ fun Home(navController: NavHostController) {
 
         item {
             Spacer(modifier = Modifier.height(20.dp))
-            Column {
+            Column(modifier = Modifier, horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     "Main statistics",
-                    fontSize = 30.sp,
-                    modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                    fontSize = 30.sp
                 )
-                Text("$money€", fontSize = 100.sp)
+                Text("%.2f€".format(money), fontSize = 90.sp)
+
             }
         }
         item {
@@ -114,6 +120,6 @@ fun Home(navController: NavHostController) {
             }
         }
     }
-    Column {  }
+    Column { }
 
 }

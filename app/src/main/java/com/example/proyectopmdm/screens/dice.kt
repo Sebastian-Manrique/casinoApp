@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -56,6 +57,7 @@ fun Dice(navController: NavHostController) {
     val list = remember { mutableStateListOf<Int>() }
     var isExpanded by remember { mutableStateOf(false) } // The box is open or not
     var betNumber by remember { mutableIntStateOf(0) }
+    var colorBet: Boolean? by remember { mutableStateOf(null) }
 
     Column(
         modifier = Modifier
@@ -71,9 +73,12 @@ fun Dice(navController: NavHostController) {
 
         Spacer(Modifier.height(10.dp))
 
-        GamblingNumbersGrid(betNumber = betNumber) { newBetNumber ->
-            betNumber = newBetNumber
-        }
+        GamblingNumbersGrid(
+            colorBet = colorBet,
+            betNumber = betNumber,
+            onBetNumberChange = { newBetNumber -> betNumber = newBetNumber },
+            onColorBetChange = { newColorBet -> colorBet = newColorBet }
+        )
 
         Spacer(Modifier.height(10.dp))
 
@@ -104,9 +109,12 @@ fun Dice(navController: NavHostController) {
                         .show()
                 } else if (moneyBet.isEmpty()) {
                     Toast.makeText(context, "You didn't bet any money!", Toast.LENGTH_SHORT).show()
+                } else if (moneyBet.toDouble() > money) {
+                    Toast.makeText(context, "Liar, you don't have that money!", Toast.LENGTH_SHORT)
+                        .show()
                 } else {
                     resultNumber = randomGenerator(list)
-                    betFun(betNumber, resultNumber, moneyBet, context)
+                    betFun(betNumber, moneyBet, context, resultNumber)
                 }
             },
             //No se puede simplificar el color.
@@ -170,16 +178,18 @@ fun Dice(navController: NavHostController) {
     }
 }
 
-fun betFun(betNumber: Int, resultNumber: Int, moneyBet: String, context: Context) {
-    if (moneyBet.toDouble() > money) {
-        Toast.makeText(context, "Liar, you don't have that money!", Toast.LENGTH_SHORT).show()
-    } else if (betNumber == resultNumber) {
-        println("betNumber == $betNumber, resultNumber == $resultNumber")
-        if (moneyBet.toDouble() <= money) {
-            Toast.makeText(context, "You just earn money!! 💲🤑💸", Toast.LENGTH_SHORT).show()
-            money += moneyBet.toDouble() * 2
-        }
+fun betFun(
+    betNumber: Int,
+    moneyBet: String,
+    context: Context,
+    resultNumber: Int
+) {
+    println("betNumber == $betNumber, resultNumber == $resultNumber")
+    if (resultNumber == betNumber) {
+        Toast.makeText(context, "You just earn money!! 💲🤑💸", Toast.LENGTH_SHORT).show()
+        money += moneyBet.toDouble() * 2
     } else {
+        Toast.makeText(context, "You just lost money!! 😢", Toast.LENGTH_SHORT).show()
         money -= moneyBet.toDouble()
     }
 }
@@ -193,7 +203,12 @@ fun Ver() {
 }
 
 @Composable
-fun GamblingNumbersGrid(betNumber: Int, onBetNumberChange: (Int) -> Unit) {
+fun GamblingNumbersGrid(
+    colorBet: Boolean?,
+    betNumber: Int,
+    onBetNumberChange: (Int) -> Unit,
+    onColorBetChange: (Boolean) -> Unit
+) {
     // Crear un estado mutable para almacenar los colores de fondo de cada celda
     val colors = remember {
         mutableStateListOf<Color>().apply {
@@ -211,6 +226,7 @@ fun GamblingNumbersGrid(betNumber: Int, onBetNumberChange: (Int) -> Unit) {
             Box(
                 modifier = Modifier
                     .padding(4.dp)
+                    .height(100.dp)
                     .size(100.dp) // Tamaño de cada celda
                     .background(colors[index]) // Usar el color específico para cada celda
                     .clickable {
@@ -224,32 +240,37 @@ fun GamblingNumbersGrid(betNumber: Int, onBetNumberChange: (Int) -> Unit) {
                 )
             }
         }
-        item {
-            Box(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .size(100.dp) // Tamaño de cada celda
-                    .background(Color.Black) // Usar el color específico para cada celda
-                    .clickable {
-                        println("betting on black!")
-                    }, contentAlignment = Alignment.Center
-            ) {
-                Text("")
-            }
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .background(Color.Black)
+                .clickable {
+                    println("betting on black!")
+                    onColorBetChange(false)
+                }, contentAlignment = Alignment.Center
+        ) {
+            Text("")
         }
-        item {
-            Box(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .size(100.dp) // Tamaño de cada celda
-                    .background(Color.Red) // Usar el color específico para cada celda
-                    .clickable {
-                        println("betting on red!")
-                    }, contentAlignment = Alignment.Center
-            ) {
-                Text("")
-            }
+
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .background(Color.Red)
+                .clickable {
+                    println("betting on red!")
+                    onColorBetChange(true)
+                }, contentAlignment = Alignment.Center
+        ) {
+            Text("")
         }
+
     }
 
 }
@@ -267,7 +288,6 @@ private fun handleCellClick(
     updateBetNumber(index + 1) // Actualizar el número seleccionado
     println("El número seleccionado es ${index + 1}")
 }
-
 
 fun randomGenerator(list: SnapshotStateList<Int>): Int {
     val number = (1..12).random()
