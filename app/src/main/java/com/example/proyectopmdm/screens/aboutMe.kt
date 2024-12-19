@@ -13,14 +13,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.proyectopmdm.R
@@ -65,6 +69,13 @@ fun AboutMe(navController: NavHostController) {
             ) {
                 Text(
                     "Change information"
+                )
+                Image(
+                    painter = painterResource(id =R.drawable.settings),
+                    contentDescription = "Settings",
+                    modifier = Modifier
+                        .size(50.dp)
+                        .align(Alignment.CenterEnd)
                 )
             }
         }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -28,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -50,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.proyectopmdm.ui.theme.BlueBotton
 
 @Composable
 fun Dice(navController: NavHostController) {
@@ -58,6 +61,7 @@ fun Dice(navController: NavHostController) {
     var isExpanded by remember { mutableStateOf(false) } // The box is open or not
     var betNumber by remember { mutableIntStateOf(0) }
     var colorBet: Boolean? by remember { mutableStateOf(null) }
+
 
     Column(
         modifier = Modifier
@@ -77,7 +81,8 @@ fun Dice(navController: NavHostController) {
             colorBet = colorBet,
             betNumber = betNumber,
             onBetNumberChange = { newBetNumber -> betNumber = newBetNumber },
-            onColorBetChange = { newColorBet -> colorBet = newColorBet }
+            onColorBetChange = { newColorBet -> colorBet = newColorBet },
+            onResetColorBet = { colorBet = null }
         )
 
         Spacer(Modifier.height(10.dp))
@@ -104,21 +109,32 @@ fun Dice(navController: NavHostController) {
         Button(
             onClick = {
                 println("Cantidad apostada: $moneyBet, numero elegido: $betNumber")
-                if (betNumber == 0) {
-                    Toast.makeText(context, "You didn't select any number!", Toast.LENGTH_SHORT)
-                        .show()
-                } else if (moneyBet.isEmpty()) {
+                if (moneyBet.isEmpty()) {
                     Toast.makeText(context, "You didn't bet any money!", Toast.LENGTH_SHORT).show()
                 } else if (moneyBet.toDouble() > money) {
-                    Toast.makeText(context, "Liar, you don't have that money!", Toast.LENGTH_SHORT)
+                    Toast.makeText(
+                        context,
+                        "Liar, you don't have that money!",
+                        Toast.LENGTH_SHORT
+                    )
                         .show()
+                } else if (moneyBet.toDouble() < 0) {
+                    Toast.makeText(context, "You can't bet negative money!", Toast.LENGTH_SHORT)
+                        .show()
+                } else if (betNumber == 0 && colorBet == null) {
+                    Toast.makeText(
+                        context,
+                        "You didn't select any number or color!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
                 } else {
                     resultNumber = randomGenerator(list)
-                    betFun(betNumber, moneyBet, context, resultNumber)
+                    betFun(betNumber, moneyBet, context, resultNumber, colorBet)
                 }
             },
             //No se puede simplificar el color.
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF379ca0))
+            colors = ButtonDefaults.buttonColors(containerColor = BlueBotton)
         ) {
             Text("Roll the dices! 🎲")
         }
@@ -182,15 +198,30 @@ fun betFun(
     betNumber: Int,
     moneyBet: String,
     context: Context,
-    resultNumber: Int
+    resultNumber: Int,
+    colorBet: Boolean?
 ) {
-    println("betNumber == $betNumber, resultNumber == $resultNumber")
-    if (resultNumber == betNumber) {
-        Toast.makeText(context, "You just earn money!! 💲🤑💸", Toast.LENGTH_SHORT).show()
-        money += moneyBet.toDouble() * 2
+    println("betNumber == $betNumber, resultNumber == $resultNumber, colorBet == $colorBet")
+    if (colorBet == null) {
+        if (betNumber == 0) {
+            Toast.makeText(context, "You didn't select any number!", Toast.LENGTH_SHORT)
+                .show()
+        } else if (resultNumber == betNumber) {
+            println("resultNumber == $resultNumber, betNumber == $betNumber")
+            Toast.makeText(context, "You just earn money!! 💲🤑💸", Toast.LENGTH_SHORT).show()
+            money += moneyBet.toDouble() * 2
+        } else {
+            Toast.makeText(context, "You just lost money!! 😢", Toast.LENGTH_SHORT).show()
+            money -= moneyBet.toDouble()
+        }
     } else {
-        Toast.makeText(context, "You just lost money!! 😢", Toast.LENGTH_SHORT).show()
-        money -= moneyBet.toDouble()
+        if ((resultNumber % 2 == 0 && colorBet) || (resultNumber % 2 == 1 && !colorBet)) { // Black is true, Red is false
+            Toast.makeText(context, "You just earn money!! 💲🤑💸", Toast.LENGTH_SHORT).show()
+            money += moneyBet.toDouble() * 2
+        } else {
+            Toast.makeText(context, "You just lost money!! 😢", Toast.LENGTH_SHORT).show()
+            money -= moneyBet.toDouble()
+        }
     }
 }
 
@@ -207,7 +238,8 @@ fun GamblingNumbersGrid(
     colorBet: Boolean?,
     betNumber: Int,
     onBetNumberChange: (Int) -> Unit,
-    onColorBetChange: (Boolean) -> Unit
+    onColorBetChange: (Boolean) -> Unit,
+    onResetColorBet: () -> Unit // New parameter to reset colorBet
 ) {
     // Crear un estado mutable para almacenar los colores de fondo de cada celda
     val colors = remember {
@@ -215,6 +247,10 @@ fun GamblingNumbersGrid(
             repeat(12) { add(if (it % 2 == 0) Color.Red else Color.Black) }
         }
     }
+
+
+    val blackBoxColor = remember { mutableStateOf(Color.Black) }
+    val redBoxColor = remember { mutableStateOf(Color.Red) }
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(6), // 6 columnas
@@ -233,6 +269,7 @@ fun GamblingNumbersGrid(
                         handleCellClick(index, colors) { newBet ->
                             onBetNumberChange(newBet) // Notificar el cambio al componente padre
                         }
+                        onResetColorBet()
                     }, contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -243,17 +280,24 @@ fun GamblingNumbersGrid(
     }
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         Box(
             modifier = Modifier
-                .size(100.dp)
-                .background(Color.Black)
+                .background(blackBoxColor.value)
+                .weight(1f)
+                .width(100.dp)
+                .height(100.dp)
                 .clickable {
-                    println("betting on black!")
-                    onColorBetChange(false)
+                    println("betting on black!") //Black is true
+                    handleColorClick(
+                        "black",
+                        blackBoxColor,
+                        redBoxColor,
+                        onColorBetChange,
+                        onBetNumberChange
+                    )
                 }, contentAlignment = Alignment.Center
         ) {
             Text("")
@@ -261,11 +305,19 @@ fun GamblingNumbersGrid(
 
         Box(
             modifier = Modifier
-                .size(100.dp)
-                .background(Color.Red)
+                .background(redBoxColor.value)
+                .weight(1f)
+                .width(100.dp)
+                .height(100.dp)
                 .clickable {
                     println("betting on red!")
-                    onColorBetChange(true)
+                    handleColorClick(
+                        "red",
+                        blackBoxColor,
+                        redBoxColor,
+                        onColorBetChange,
+                        onBetNumberChange
+                    )
                 }, contentAlignment = Alignment.Center
         ) {
             Text("")
@@ -275,18 +327,40 @@ fun GamblingNumbersGrid(
 
 }
 
-
 // Función para manejar el clic de una celda
 private fun handleCellClick(
     index: Int, colors: SnapshotStateList<Color>, updateBetNumber: (Int) -> Unit
 ) {
-    colors[index] = if (colors[index] == Color.Red || colors[index] == Color.Black) {
-        Color(0xFF9c9c9c) // Negro apagado
-    } else {
-        if (index % 2 == 0) Color.Red else Color.Black // Restaurar al color original
+    // Reset all colors to their original state
+    for (i in colors.indices) {
+        colors[i] = if (i % 2 == 0) Color.Red else Color.Black
     }
+    // Set the selected cell's color
+    colors[index] = Color(0xFF9c9c9c) // Negro apagado
     updateBetNumber(index + 1) // Actualizar el número seleccionado
     println("El número seleccionado es ${index + 1}")
+}
+
+private fun handleColorClick(
+    color: String,
+    blackBoxColor: MutableState<Color>,
+    redBoxColor: MutableState<Color>,
+    onColorBetChange: (Boolean) -> Unit,
+    onBetNumberChange: (Int) -> Unit
+) {
+    // Reset the colors of both boxes
+    blackBoxColor.value = Color.Black
+    redBoxColor.value = Color.Red
+
+    // Set the selected color's grid to gray
+    if (color == "black") {
+        onColorBetChange(true)
+        blackBoxColor.value = Color.Gray
+    } else if (color == "red") {
+        onColorBetChange(false)
+        redBoxColor.value = Color.Gray
+    }
+    onBetNumberChange(0) // Reset the selected number
 }
 
 fun randomGenerator(list: SnapshotStateList<Int>): Int {
