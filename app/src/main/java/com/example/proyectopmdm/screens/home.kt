@@ -20,6 +20,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
@@ -76,9 +79,24 @@ fun Home(navController: NavHostController) {
         item {
             Box(modifier = Modifier
                 .fillMaxWidth()
-                .border(
-                    width = 2.dp, color = Color.Black, shape = CircleShape
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 8.dp,
+                        bottomStart = 8.dp,
+                        bottomEnd = 16.dp
+                    )
                 )
+                .background(Color.Gray)
+                .border(
+                    2.dp, Color.Black, RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 8.dp,
+                        bottomStart = 8.dp,
+                        bottomEnd = 16.dp
+                    )
+                )
+                .padding(16.dp)
                 .clickable { isExpanded = !isExpanded } // Alterna la expansión al hacer clic
                 .padding(16.dp), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -87,16 +105,24 @@ fun Home(navController: NavHostController) {
                         style = MaterialTheme.typography.labelMedium
                     )
                     if (isExpanded) {
-                        LazyColumn(
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 16.dp)
+                                .padding(top = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            items(10) { index ->
-                                Text("Item $index")
+                            Button(onClick = { money += 20 }) {
+                                Text("20€")
+                            }
+
+                            Button(onClick = { money += 60 }) {
+                                Text("60€")
+                            }
+
+                            Button(onClick = { money += 100 }) {
+                                Text("100€")
                             }
                         }
-
                     }
                 }
             }

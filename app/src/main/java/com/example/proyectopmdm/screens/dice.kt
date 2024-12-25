@@ -82,7 +82,7 @@ fun Dice(navController: NavHostController) {
             betNumber = betNumber,
             onBetNumberChange = { newBetNumber -> betNumber = newBetNumber },
             onColorBetChange = { newColorBet -> colorBet = newColorBet },
-            onResetColorBet = { colorBet = null }
+            onResetColorBet = { colorBet = null } // Added parameter
         )
 
         Spacer(Modifier.height(10.dp))
@@ -232,52 +232,53 @@ fun Ver() {
     val navController = rememberNavController()
     Dice(navController)
 }
-
 @Composable
 fun GamblingNumbersGrid(
     colorBet: Boolean?,
     betNumber: Int,
     onBetNumberChange: (Int) -> Unit,
-    onColorBetChange: (Boolean) -> Unit,
-    onResetColorBet: () -> Unit // New parameter to reset colorBet
+    onColorBetChange: (Boolean?) -> Unit, // Actualizamos el tipo para admitir null
+    onResetColorBet: () -> Unit // Added parameter
 ) {
-    // Crear un estado mutable para almacenar los colores de fondo de cada celda
     val colors = remember {
         mutableStateListOf<Color>().apply {
             repeat(12) { add(if (it % 2 == 0) Color.Red else Color.Black) }
         }
     }
 
-
     val blackBoxColor = remember { mutableStateOf(Color.Black) }
     val redBoxColor = remember { mutableStateOf(Color.Red) }
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(6), // 6 columnas
+        columns = GridCells.Fixed(6),
         modifier = Modifier
             .fillMaxWidth()
             .border(width = 2.dp, color = Color.Black)
     ) {
-        items(12) { index -> // 12 elementos (2 columnas * 6 filas)
+        items(12) { index ->
             Box(
                 modifier = Modifier
                     .padding(4.dp)
                     .height(100.dp)
-                    .size(100.dp) // Tamaño de cada celda
-                    .background(colors[index]) // Usar el color específico para cada celda
+                    .size(100.dp)
+                    .background(colors[index])
                     .clickable {
                         handleCellClick(index, colors) { newBet ->
-                            onBetNumberChange(newBet) // Notificar el cambio al componente padre
+                            onBetNumberChange(newBet)
+                            onColorBetChange(null) // Reseteamos la apuesta de color
                         }
-                        onResetColorBet()
-                    }, contentAlignment = Alignment.Center
+                    },
+                contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "${index + 1}", color = Color.White, fontSize = 20.sp
+                    text = "${index + 1}",
+                    color = Color.White,
+                    fontSize = 20.sp
                 )
             }
         }
     }
+
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -290,15 +291,16 @@ fun GamblingNumbersGrid(
                 .width(100.dp)
                 .height(100.dp)
                 .clickable {
-                    println("betting on black!") //Black is true
                     handleColorClick(
                         "black",
                         blackBoxColor,
                         redBoxColor,
                         onColorBetChange,
-                        onBetNumberChange
+                        onBetNumberChange,
+                        onResetColorBet // Added parameter
                     )
-                }, contentAlignment = Alignment.Center
+                },
+            contentAlignment = Alignment.Center
         ) {
             Text("")
         }
@@ -310,34 +312,32 @@ fun GamblingNumbersGrid(
                 .width(100.dp)
                 .height(100.dp)
                 .clickable {
-                    println("betting on red!")
                     handleColorClick(
                         "red",
                         blackBoxColor,
                         redBoxColor,
                         onColorBetChange,
-                        onBetNumberChange
+                        onBetNumberChange,
+                        onResetColorBet // Added parameter
                     )
-                }, contentAlignment = Alignment.Center
+                },
+            contentAlignment = Alignment.Center
         ) {
             Text("")
         }
-
     }
-
 }
 
-// Función para manejar el clic de una celda
 private fun handleCellClick(
-    index: Int, colors: SnapshotStateList<Color>, updateBetNumber: (Int) -> Unit
+    index: Int,
+    colors: SnapshotStateList<Color>,
+    updateBetNumber: (Int) -> Unit
 ) {
-    // Reset all colors to their original state
     for (i in colors.indices) {
         colors[i] = if (i % 2 == 0) Color.Red else Color.Black
     }
-    // Set the selected cell's color
-    colors[index] = Color(0xFF9c9c9c) // Negro apagado
-    updateBetNumber(index + 1) // Actualizar el número seleccionado
+    colors[index] = Color(0xFF9c9c9c)
+    updateBetNumber(index + 1)
     println("El número seleccionado es ${index + 1}")
 }
 
@@ -345,14 +345,13 @@ private fun handleColorClick(
     color: String,
     blackBoxColor: MutableState<Color>,
     redBoxColor: MutableState<Color>,
-    onColorBetChange: (Boolean) -> Unit,
-    onBetNumberChange: (Int) -> Unit
+    onColorBetChange: (Boolean?) -> Unit,
+    onBetNumberChange: (Int) -> Unit,
+    onResetColorBet: () -> Unit // Added parameter
 ) {
-    // Reset the colors of both boxes
     blackBoxColor.value = Color.Black
     redBoxColor.value = Color.Red
 
-    // Set the selected color's grid to gray
     if (color == "black") {
         onColorBetChange(true)
         blackBoxColor.value = Color.Gray
@@ -360,7 +359,8 @@ private fun handleColorClick(
         onColorBetChange(false)
         redBoxColor.value = Color.Gray
     }
-    onBetNumberChange(0) // Reset the selected number
+    onBetNumberChange(0) // Reseteamos la selección de número
+    onResetColorBet() // Reset color bet
 }
 
 fun randomGenerator(list: SnapshotStateList<Int>): Int {
