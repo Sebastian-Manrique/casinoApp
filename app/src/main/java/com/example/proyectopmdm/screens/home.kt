@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-
+import com.example.proyectopmdm.Routes
 
 var money by mutableDoubleStateOf(100.00)
 
@@ -55,9 +56,6 @@ fun Home(navController: NavHostController) {
             AddMoneyBox()
         }
         item {
-            LastTransactionBox()
-        }
-        item {
             GambleImage()
         }
         item {
@@ -68,6 +66,6 @@ fun Home(navController: NavHostController) {
 
 @Preview
 @Composable
-fun previewHome() {
+fun PreviewHome() {
     Home(navController = rememberNavController())
 }

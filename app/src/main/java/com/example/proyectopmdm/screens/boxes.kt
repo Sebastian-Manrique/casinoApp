@@ -90,45 +90,6 @@ fun AddMoneyBox() {
 }
 
 @Composable
-fun LastTransactionBox() {
-    Spacer(modifier = Modifier.height(16.dp))
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(
-                RoundedCornerShape(
-                    topStart = 16.dp,
-                    topEnd = 8.dp,
-                    bottomStart = 8.dp,
-                    bottomEnd = 16.dp
-                )
-            )
-            .background(Color.Gray)
-            .border(
-                2.dp, Color.Black, RoundedCornerShape(
-                    topStart = 16.dp,
-                    topEnd = 8.dp,
-                    bottomStart = 8.dp,
-                    bottomEnd = 16.dp
-                )
-            )
-            .padding(5.dp)
-            .padding(5.dp), contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                "Last transaction\n" +
-                        "Usuario: John Doe\n" +
-                        "Lugar: Ruleta\n" +
-                        "Introducido: 20€\n" +
-                        "Ganancia: +20€"
-            )
-        }
-    }
-}
-
-@Composable
 fun GambleImage() {
     Box(
         modifier = Modifier

@@ -76,6 +76,7 @@ fun MainScaffold(navController: NavHostController) {
             composable(Routes.DICE) { Dice(navController) }
             composable(Routes.ME) { AboutMe(navController) }
             composable(Routes.CREATEJS) { CreateUser(navController) }
+            composable(Routes.LOGIN) { LogIn(navController) }
         }
     }
 }
