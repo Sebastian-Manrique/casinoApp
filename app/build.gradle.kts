@@ -54,7 +54,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
+
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -69,15 +69,16 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.compose.animated.navbar)
 
-    //Firebase
     implementation(libs.androidx.credentials)
-    implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
-
+    //Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
-    implementation(libs.firebase.auth.ktx)
     //Coil
     implementation("io.coil-kt:coil-compose:2.1.0")
     //FireStore
     implementation ("com.google.firebase:firebase-firestore-ktx:25.1.1")
+    implementation ("com.google.android.gms:play-services-auth:21.3.0")
+
+    implementation ("com.google.firebase:firebase-auth:22.0.0")
+    implementation ("com.google.firebase:firebase-firestore:25.1.1")
 }

@@ -20,6 +20,8 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.MaterialTheme
+import com.example.proyectopmdm.ui.theme.buttonColorDefalt
 
 @Composable
 fun MainScaffold(navController: NavHostController) {
@@ -29,7 +31,6 @@ fun MainScaffold(navController: NavHostController) {
     // Mapa que asocia las rutas con los iconos y etiquetas
     val navigationMap = mapOf(
         Routes.HOME to Pair(Icons.Default.Home, "Home"),
-        Routes.ROULETTE to Pair(Icons.Default.Warning, "Roulette"),
         Routes.PRIZES to Pair(Icons.Default.Star, "Prizes"),
         Routes.DICE to Pair(Icons.Default.Email, "Dice"),
         Routes.ME to Pair(Icons.Default.Person, "About Me")
@@ -40,8 +41,10 @@ fun MainScaffold(navController: NavHostController) {
             AnimatedBottomBar(
                 selectedItem = navigationMap.keys.indexOf(currentRoute),
                 itemSize = navigationMap.size,
-                containerColor = Color.Black,
+                containerColor = backgroundColor,
                 indicatorStyle = IndicatorStyle.LINE,
+                indicatorColor = buttonColorDefalt,
+                contentColor = buttonColorDefalt,
             ) {
                 navigationMap.forEach { (route, iconAndLabel) ->
                     BottomBarItem(
@@ -59,7 +62,7 @@ fun MainScaffold(navController: NavHostController) {
                         },
                         imageVector = iconAndLabel.first,
                         label = iconAndLabel.second,
-                        containerColor = Color.Transparent,
+                        containerColor = Color.Transparent
                     )
                 }
             }
@@ -71,7 +74,6 @@ fun MainScaffold(navController: NavHostController) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Routes.HOME) { Home(navController) }
-            composable(Routes.ROULETTE) { Roulette(navController) }
             composable(Routes.PRIZES) { Prizes(navController) }
             composable(Routes.DICE) { Dice(navController) }
             composable(Routes.ME) { AboutMe(navController) }

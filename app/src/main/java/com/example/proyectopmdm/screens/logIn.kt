@@ -3,6 +3,7 @@ package com.example.proyectopmdm.screens
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -29,7 +30,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.proyectopmdm.GoogleAuthClient
 import com.example.proyectopmdm.R
 import com.example.proyectopmdm.Routes
+import com.example.proyectopmdm.ui.theme.buttonColorDefalt
+import com.example.proyectopmdm.ui.theme.whiteSebas
 import kotlinx.coroutines.launch
+
+var backgroundColor by mutableStateOf(whiteSebas)
 
 @Composable
 fun LogIn(navController: NavHostController) {
@@ -43,14 +48,26 @@ fun LogIn(navController: NavHostController) {
     var password by remember { mutableStateOf("") }
 
     val onButtonClick = {
-        Log.d("LoginForm", "Username: $username, Password: $password")
-        navController.navigate(Routes.HOME)
+        if (username.isEmpty()) {
+            showToast(
+                context,
+                "You cannot leave the user empty."
+            )
+        } else if (password.length < 8) {
+            showToast(
+                context,
+                "You could not have entered a password of less than 8 characters."
+            )
+        } else {
+            navController.navigate(Routes.HOME)
+        }
     }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(),
+            .fillMaxHeight()
+            .background(backgroundColor),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -112,8 +129,14 @@ fun LogIn(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        Button(onClick = onButtonClick) {
-            Text(text = "Log in")
+        Button(
+            onClick = onButtonClick,
+            colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)
+        ) {
+            Text(
+                text = "Log in",
+                color = Color.Black
+            )
         }
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -122,8 +145,7 @@ fun LogIn(navController: NavHostController) {
             onClick = {
                 if (isSingIn) {
                     coroutineScope.launch {
-                        googleAuthClient.signOut()
-                        isSingIn = false
+                        navController.navigate(Routes.HOME)
                     }
                 } else {
                     coroutineScope.launch {
@@ -155,8 +177,11 @@ fun LogIn(navController: NavHostController) {
 
         Button(onClick = {
             navController.navigate(Routes.CREATEJS)
-        }) {
-            Text(text = "Create one")
+        }, colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)) {
+            Text(
+                text = "Create one",
+                color = Color.Black
+            )
         }
     }
 }

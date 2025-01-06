@@ -1,5 +1,6 @@
 package com.example.proyectopmdm.screens
 
+import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.proyectopmdm.R
@@ -38,10 +40,24 @@ import com.example.proyectopmdm.Routes
 fun Prizes(navController: NavHostController) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .fillMaxWidth().padding(top = 100.dp),
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .background(backgroundColor),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(Modifier.height(10.dp))
+
+        Text(
+            "Redeem your codes in the most recognized businesses:",
+            color = Color.Black,
+            fontSize = 25.sp,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(20.dp))
+
         ZamazonBox()
 
         PiePaxBox()
@@ -52,7 +68,7 @@ fun Prizes(navController: NavHostController) {
 
 @Preview
 @Composable
-fun previewPrizes() {
+fun PreviewPrizes() {
     val navController = rememberNavController()
     Prizes(navController)
 }

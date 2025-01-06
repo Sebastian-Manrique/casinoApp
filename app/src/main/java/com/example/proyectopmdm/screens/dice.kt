@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -44,15 +45,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.proyectopmdm.ui.theme.BlueBotton
+import com.example.proyectopmdm.ui.theme.diceBlack
+import com.example.proyectopmdm.ui.theme.diceWhite
+import com.example.proyectopmdm.ui.theme.whiteSebas
 
 @Composable
 fun Dice(navController: NavHostController) {
@@ -62,12 +69,11 @@ fun Dice(navController: NavHostController) {
     var betNumber by remember { mutableIntStateOf(0) }
     var colorBet: Boolean? by remember { mutableStateOf(null) }
 
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .background(Color(0xFF007c57)),
+            .background(if (backgroundColor == whiteSebas) diceWhite else diceBlack),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -102,7 +108,7 @@ fun Dice(navController: NavHostController) {
         )
         Spacer(Modifier.height(5.dp))
 
-        Text("Currently money %.2f€".format(money), fontSize = 17.sp)
+        Text("Currently money ${money}€", fontSize = 17.sp)
 
         Spacer(Modifier.height(5.dp))
 
@@ -110,24 +116,17 @@ fun Dice(navController: NavHostController) {
             onClick = {
                 println("Cantidad apostada: $moneyBet, numero elegido: $betNumber")
                 if (moneyBet.isEmpty()) {
-                    Toast.makeText(context, "You didn't bet any money!", Toast.LENGTH_SHORT).show()
-                } else if (moneyBet.toDouble() > money) {
-                    Toast.makeText(
-                        context,
-                        "Liar, you don't have that money!",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                } else if (moneyBet.toDouble() < 0) {
-                    Toast.makeText(context, "You can't bet negative money!", Toast.LENGTH_SHORT)
-                        .show()
+                    showToast(context, "You didn't bet any money!")
+                } else if (moneyBet.contains(".")) {
+                    showToast(context, "It is not allowed to bet with cents 🤏")
+                } else if (moneyBet.contains(",")) {
+                    showToast(context, "It is not allowed to bet with cents 🤏")
+                } else if (moneyBet.toInt() > money) {
+                    showToast(context, "Liar, you don't have that money!")
+                } else if (moneyBet.toInt() < 0) {
+                    showToast(context, "You can't bet negative money!")
                 } else if (betNumber == 0 && colorBet == null) {
-                    Toast.makeText(
-                        context,
-                        "You didn't select any number or color!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
+                    showToast(context, "You didn't select any number or color!")
                 } else {
                     resultNumber = randomGenerator(list)
                     betFun(betNumber, moneyBet, context, resultNumber, colorBet)
@@ -141,7 +140,16 @@ fun Dice(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "The result is $resultNumber", fontSize = 20.sp)
+
+        Text(
+            text = buildAnnotatedString {
+                append("The result is ")
+                withStyle(style = SpanStyle(color = if (resultNumber % 2 == 0) Color.Black else Color.Red)) {
+                    append("$resultNumber")
+                }
+            },
+            fontSize = 20.sp
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -208,19 +216,19 @@ fun betFun(
                 .show()
         } else if (resultNumber == betNumber) {
             println("resultNumber == $resultNumber, betNumber == $betNumber")
-            Toast.makeText(context, "You just earn money!! 💲🤑💸", Toast.LENGTH_SHORT).show()
-            money += moneyBet.toDouble() * 2
+            showToast(context, "You just earn money!! 💲🤑💸")
+            money += moneyBet.toInt() * 2
         } else {
-            Toast.makeText(context, "You just lost money!! 😢", Toast.LENGTH_SHORT).show()
-            money -= moneyBet.toDouble()
+            showToast(context, "You just lost money!! 😢")
+            money -= moneyBet.toInt()
         }
     } else {
         if ((resultNumber % 2 == 0 && colorBet) || (resultNumber % 2 == 1 && !colorBet)) { // Black is true, Red is false
-            Toast.makeText(context, "You just earn money!! 💲🤑💸", Toast.LENGTH_SHORT).show()
-            money += moneyBet.toDouble() * 2
+            showToast(context, "You just earn money!! 💲🤑💸")
+            money += moneyBet.toInt() * 2
         } else {
-            Toast.makeText(context, "You just lost money!! 😢", Toast.LENGTH_SHORT).show()
-            money -= moneyBet.toDouble()
+            showToast(context, "You just lost money!! 😢")
+            money -= moneyBet.toInt()
         }
     }
 }
@@ -232,6 +240,7 @@ fun Ver() {
     val navController = rememberNavController()
     Dice(navController)
 }
+
 @Composable
 fun GamblingNumbersGrid(
     colorBet: Boolean?,
@@ -263,10 +272,10 @@ fun GamblingNumbersGrid(
                     .size(100.dp)
                     .background(colors[index])
                     .clickable {
-                        handleCellClick(index, colors) { newBet ->
+                        handleCellClick(index, colors, { newBet ->
                             onBetNumberChange(newBet)
                             onColorBetChange(null) // Reseteamos la apuesta de color
-                        }
+                        }, onColorBetChange, blackBoxColor, redBoxColor)
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -297,7 +306,8 @@ fun GamblingNumbersGrid(
                         redBoxColor,
                         onColorBetChange,
                         onBetNumberChange,
-                        onResetColorBet // Added parameter
+                        onResetColorBet,
+                        colors // Pass colors to reset the number color
                     )
                 },
             contentAlignment = Alignment.Center
@@ -318,7 +328,8 @@ fun GamblingNumbersGrid(
                         redBoxColor,
                         onColorBetChange,
                         onBetNumberChange,
-                        onResetColorBet // Added parameter
+                        onResetColorBet,
+                        colors // Pass colors to reset the number color
                     )
                 },
             contentAlignment = Alignment.Center
@@ -331,13 +342,19 @@ fun GamblingNumbersGrid(
 private fun handleCellClick(
     index: Int,
     colors: SnapshotStateList<Color>,
-    updateBetNumber: (Int) -> Unit
+    updateBetNumber: (Int) -> Unit,
+    onColorBetChange: (Boolean?) -> Unit,
+    blackBoxColor: MutableState<Color>,
+    redBoxColor: MutableState<Color>
 ) {
     for (i in colors.indices) {
         colors[i] = if (i % 2 == 0) Color.Red else Color.Black
     }
     colors[index] = Color(0xFF9c9c9c)
     updateBetNumber(index + 1)
+    onColorBetChange(null) // Reseteamos la apuesta de color
+    blackBoxColor.value = Color.Black
+    redBoxColor.value = Color.Red
     println("El número seleccionado es ${index + 1}")
 }
 
@@ -347,7 +364,8 @@ private fun handleColorClick(
     redBoxColor: MutableState<Color>,
     onColorBetChange: (Boolean?) -> Unit,
     onBetNumberChange: (Int) -> Unit,
-    onResetColorBet: () -> Unit // Added parameter
+    onResetColorBet: () -> Unit,
+    colors: SnapshotStateList<Color>
 ) {
     blackBoxColor.value = Color.Black
     redBoxColor.value = Color.Red
@@ -359,8 +377,12 @@ private fun handleColorClick(
         onColorBetChange(false)
         redBoxColor.value = Color.Gray
     }
-    onBetNumberChange(0) // Reseteamos la selección de número
-    onResetColorBet() // Reset color bet
+
+    // Reset the selected number and its color
+    onBetNumberChange(0)
+    for (i in colors.indices) {
+        colors[i] = if (i % 2 == 0) Color.Red else Color.Black
+    }
 }
 
 fun randomGenerator(list: SnapshotStateList<Int>): Int {

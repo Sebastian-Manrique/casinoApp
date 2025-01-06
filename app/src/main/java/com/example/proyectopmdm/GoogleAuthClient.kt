@@ -2,11 +2,38 @@ package com.example.proyectopmdm
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
+import coil.compose.rememberAsyncImagePainter
+import com.example.proyectopmdm.screens.backgroundColor
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -26,6 +53,7 @@ class GoogleAuthClient(
     private val firebaseAuth = FirebaseAuth.getInstance()
 
     private val db = FirebaseFirestore.getInstance()
+
 
     var userName: String? = null
     var userId: String? = null
@@ -134,13 +162,13 @@ class GoogleAuthClient(
     }
 
     private fun addUserWithDefaultMoney(userId: String) {
-        val userRef = db.collection("users").document(userId)
+        val userRef = db.collection("totalMoney").document(userId)
         userRef.get().addOnSuccessListener { document ->
             if (!document.exists()) {
-                val user = hashMapOf(
+                val moneyData = hashMapOf(
                     "money" to 100
                 )
-                userRef.set(user)
+                userRef.set(moneyData)
                     .addOnSuccessListener { Log.d(tag, "User added with default money") }
                     .addOnFailureListener { e -> Log.w(tag, "Error adding user", e) }
             }
@@ -148,7 +176,7 @@ class GoogleAuthClient(
     }
 
     fun getUserMoney(userId: String, callback: (Int?) -> Unit) {
-        val userRef = db.collection("users").document(userId)
+        val userRef = db.collection("totalMoney").document(userId)
         userRef.get().addOnSuccessListener { document ->
             if (document.exists()) {
                 val money = document.getLong("money")?.toInt()
@@ -168,9 +196,42 @@ class GoogleAuthClient(
         getUserMoney(userId) { money ->
             if (money != null) {
                 println(tag + "User has $money euros")
+//                com.example.proyectopmdm.screens.money = money
             } else {
                 println(tag + "User not found or error occurred")
             }
+        }
+    }
+
+    fun setUserMoney(userId: String, amount: Int, callback: (Int?) -> Unit) {
+        val userRef = db.collection("totalMoney").document(userId)
+        userRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val currentMoney = document.getLong("money")?.toInt()
+                if (currentMoney != null) {
+                    userRef.update("money", currentMoney + amount)
+                        .addOnSuccessListener {
+                            callback(currentMoney + amount)
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(tag, "Error updating user money", e)
+                            callback(null)
+                        }
+                } else {
+                    callback(null)
+                }
+            } else {
+                val moneyData = hashMapOf(
+                    "money" to 100
+                )
+                userRef.set(moneyData)
+                    .addOnSuccessListener { Log.d(tag, "User added with default money") }
+                    .addOnFailureListener { e -> Log.w(tag, "Error adding user", e) }
+                callback(null)
+            }
+        }.addOnFailureListener { e ->
+            Log.w(tag, "Error getting user money", e)
+            callback(null)
         }
     }
 
