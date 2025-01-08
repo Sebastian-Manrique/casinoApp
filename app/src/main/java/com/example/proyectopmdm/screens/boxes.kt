@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.proyectopmdm.GoogleAuthClient
 import com.example.proyectopmdm.R
 import com.example.proyectopmdm.ui.theme.blackSebas
@@ -76,7 +77,9 @@ fun AddMoneyBox(googleAuthClient: GoogleAuthClient) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = if (isExpanded) "Show less" else "+ Add money",
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.labelMedium,
+                color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+                fontSize = 20.sp,
             )
             if (isExpanded) {
                 Row(
@@ -168,13 +171,18 @@ fun GambleImage() {
             .padding(10.dp), contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Millions of people retire before they get it.")
+            Spacer(Modifier.height(10.dp))
+            Text(
+                "Millions of people retire before they get it.",
+                color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+                fontSize = 17.sp
+            )
             Image(
                 painter = painterResource(id = R.drawable.keepgambling),
                 contentDescription = "Never surrender, you're too close to win.",
                 modifier = Modifier
                     .size(300.dp)
-                    .align(alignment = Alignment.CenterHorizontally)
+                    .align(alignment = Alignment.CenterHorizontally),
             )
         }
     }
@@ -205,7 +213,12 @@ fun OurClients() {
             .padding(10.dp), contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Meet our clients.")
+            Spacer(Modifier.height(10.dp))
+            Text(
+                "Meet our clients.",
+                color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+                fontSize = 20.sp
+            )
             Image(
                 painter = painterResource(id = R.drawable.ourclients),
                 contentDescription = "Never surrender, you're too close to win.",
@@ -250,7 +263,8 @@ fun ZamazonBox() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = if (zamazon) "Zamazon Gift Card €10" else "s",
-                style = MaterialTheme.typography.labelMedium
+                color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+                fontSize = 20.sp,
             )
             if (zamazon) {
                 Row(
@@ -285,7 +299,7 @@ fun ZamazonBox() {
 fun checkMoney(context: Context) {
     if (money < 10) {
         showToast(context, "You don't have that money!")
-    }else{
+    } else {
         money -= 10
         showToast(context, "Actual money any $money €")
     }
@@ -322,7 +336,8 @@ fun PiePaxBox() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = if (piePax) "PiePax Gift Card €10" else "s",
-                style = MaterialTheme.typography.labelMedium
+                color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+                fontSize = 20.sp,
             )
             if (piePax) {
                 Row(
@@ -339,7 +354,7 @@ fun PiePaxBox() {
                     )
                     Button(
                         onClick = {
-                           checkMoney(context)
+                            checkMoney(context)
                         }, colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)
                     ) {
                         Text(
@@ -384,7 +399,8 @@ fun SthymBox() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = if (sthym) "Sthym Gift Card €10" else "s",
-                style = MaterialTheme.typography.labelMedium
+                color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+                fontSize = 20.sp,
             )
             if (sthym) {
                 Row(
@@ -449,7 +465,11 @@ fun ColorTheme() {
             .padding(10.dp), contentAlignment = Alignment.Center
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(if (checkedButton) "White mode" else "Dark mode")
+            Text(
+                if (checkedButton) "White mode" else "Dark mode",
+                color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+                fontSize = 20.sp,
+            )
             Spacer(Modifier.width(10.dp))
             Switch(
                 checked = checkedButton,

@@ -1,3 +1,4 @@
+
 plugins {
     id("com.android.application")
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -71,14 +72,12 @@ dependencies {
 
     implementation(libs.androidx.credentials)
     implementation(libs.googleid)
-    //Firebase
-    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     //Coil
     implementation("io.coil-kt:coil-compose:2.1.0")
     //FireStore
     implementation ("com.google.firebase:firebase-firestore-ktx:25.1.1")
-    implementation ("com.google.android.gms:play-services-auth:21.3.0")
-
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation ("com.google.firebase:firebase-auth:22.0.0")
     implementation ("com.google.firebase:firebase-firestore:25.1.1")
+    //Services
 }

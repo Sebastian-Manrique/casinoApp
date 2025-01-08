@@ -12,6 +12,7 @@ navigationCompose = "2.8.4"
 compose-animated-navbar = "1.0.1"
 credentialsPlayServicesAuth = "1.5.0-alpha05"
 googleid = "1.1.1"
+roomCompilerProcessingTesting = "2.6.1"
 
 [libraries]
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentialsPlayServicesAuth"}
@@ -33,6 +34,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 compose-animated-navbar = { module = "com.canopas.compose-animated-navigationbar:bottombar", version.ref = "compose-animated-navbar" }
+androidx-room-compiler-processing-testing = { group = "androidx.room", name = "room-compiler-processing-testing", version.ref = "roomCompilerProcessingTesting" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

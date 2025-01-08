@@ -35,6 +35,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.proyectopmdm.R
 import com.example.proyectopmdm.Routes
+import com.example.proyectopmdm.ui.theme.whiteSebas
 
 @Composable
 fun Prizes(navController: NavHostController) {
@@ -49,11 +50,11 @@ fun Prizes(navController: NavHostController) {
 
         Text(
             "Redeem your codes in the most recognized businesses:",
-            color = Color.Black,
+            color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
             fontSize = 25.sp,
             modifier = Modifier
-                .align(Alignment.CenterHorizontally)
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp) // Opcional para agregar márgenes laterales
         )
 
         Spacer(Modifier.height(20.dp))

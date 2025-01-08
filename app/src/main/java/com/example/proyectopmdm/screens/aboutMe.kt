@@ -32,12 +32,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.proyectopmdm.GoogleAuthClient
 import com.example.proyectopmdm.Routes
 import com.example.proyectopmdm.ui.theme.buttonColorDefalt
+import com.example.proyectopmdm.ui.theme.whiteSebas
 import kotlinx.coroutines.launch
 
 @Composable
@@ -97,12 +99,14 @@ fun AboutMe(navController: NavHostController) {
                 .padding(10.dp), contentAlignment = Alignment.Center
         ) {
             Text(
-                "User:  Ragz Fly\n" +
-                        "ID: smanriquemontiel@gmail.com\n"
+                "User:  $userName\n" +
+                        "ID: $userId\n",
+                color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+                fontSize = 20.sp,
             )
         }
         Image(
-            painter = rememberAsyncImagePainter("https://lh3.googleusercontent.com/a/ACg8ocJnTPM3hJwOesbfYfLickflwQDmKlt93ukYPDhFTJxwkYyiMNeT=s96-c"),
+            painter = rememberAsyncImagePainter("$userPhotoUrl"),
             contentDescription = "User Photo",
             modifier = Modifier.size(50.dp)
         )

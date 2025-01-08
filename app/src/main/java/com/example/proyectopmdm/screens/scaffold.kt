@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.unit.dp
 import com.example.proyectopmdm.ui.theme.buttonColorDefalt
 
 @Composable

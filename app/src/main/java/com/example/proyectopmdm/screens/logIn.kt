@@ -73,7 +73,9 @@ fun LogIn(navController: NavHostController) {
     ) {
         Text(
             text = "Spin to Win\nP.M.D.M.\nPrizes, Money, Dice & More",
-            textAlign = TextAlign.Center, fontSize = 30.sp
+            textAlign = TextAlign.Center,
+            color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+            fontSize = 30.sp
         )
 
         Spacer(modifier = Modifier.height(30.dp))
