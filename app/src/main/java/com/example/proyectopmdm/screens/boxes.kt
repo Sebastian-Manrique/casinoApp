@@ -38,6 +38,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.proyectopmdm.GoogleAuthClient
@@ -230,6 +233,8 @@ fun OurClients() {
     }
 }
 
+
+val fontComic = FontFamily(Font(R.font.comicsans, FontWeight.Black))
 //Prizes boxes
 
 @Composable
@@ -265,6 +270,7 @@ fun ZamazonBox() {
                 text = if (zamazon) "Zamazon Gift Card €10" else "s",
                 color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
                 fontSize = 20.sp,
+                fontFamily = fontComic,
             )
             if (zamazon) {
                 Row(
@@ -287,7 +293,8 @@ fun ZamazonBox() {
                     ) {
                         Text(
                             "claim this Zamazon prize",
-                            color = Color.Black
+                            color = Color.Black,
+                            fontFamily = fontComic,
                         )
                     }
                 }
@@ -338,6 +345,7 @@ fun PiePaxBox() {
                 text = if (piePax) "PiePax Gift Card €10" else "s",
                 color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
                 fontSize = 20.sp,
+                fontFamily = fontComic,
             )
             if (piePax) {
                 Row(
@@ -359,7 +367,8 @@ fun PiePaxBox() {
                     ) {
                         Text(
                             "claim this piePax prize",
-                            color = Color.Black
+                            color = Color.Black,
+                            fontFamily = fontComic,
                         )
                     }
                 }
@@ -401,6 +410,7 @@ fun SthymBox() {
                 text = if (sthym) "Sthym Gift Card €10" else "s",
                 color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
                 fontSize = 20.sp,
+                fontFamily = fontComic,
             )
             if (sthym) {
                 Row(
@@ -425,7 +435,8 @@ fun SthymBox() {
                     ) {
                         Text(
                             "claim this Sthym prize",
-                            color = Color.Black
+                            color = Color.Black,
+                            fontFamily = fontComic,
                         )
                     }
                 }

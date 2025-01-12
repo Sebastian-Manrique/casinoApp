@@ -30,6 +30,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +41,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.proyectopmdm.GoogleAuthClient
+import com.example.proyectopmdm.R
 import com.example.proyectopmdm.Routes
 import com.example.proyectopmdm.ui.theme.buttonColorDefalt
 import com.example.proyectopmdm.ui.theme.whiteSebas
@@ -131,6 +136,17 @@ fun AboutMe(navController: NavHostController) {
                 color = Color.Black
             )
         }
+
+        Spacer(Modifier.height(60.dp))
+        val fontBarras = FontFamily(Font(R.font.fuentaparaescribirbarras, FontWeight.Black))
+        Text(
+            "¿A qué tienes miedo de perder, si en realidad nada de lo que hay en el mundo te pertenece?\n" +
+                    "\n~Marco Aurelio",
+            fontFamily = fontBarras,
+            color = Color.Black,
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
