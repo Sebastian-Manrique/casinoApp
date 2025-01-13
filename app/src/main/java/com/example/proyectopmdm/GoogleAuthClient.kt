@@ -137,7 +137,7 @@ class GoogleAuthClient(
                 val authResult = firebaseAuth.signInWithCredential(authCredential).await()
 
                 if (authResult.user != null) {
-                    updateUserInfoToken(tokenCredential)
+                    updateUserInfoToken()
                     addUserWithDefaultMoney(authResult.user!!.uid)
                     return true
                 }
@@ -154,11 +154,17 @@ class GoogleAuthClient(
         return false
     }
 
-    private fun updateUserInfoToken(tokenCredential: GoogleIdTokenCredential) {
-        userName = tokenCredential.displayName
-        userId = tokenCredential.id
-        userPhotoUrl = tokenCredential.profilePictureUri.toString()
-        println(tag + "usuario $userName, id $userId, foto $userPhotoUrl")
+    private fun updateUserInfoToken() {
+        val currentUser = firebaseAuth.currentUser
+
+        currentUser?.let {
+            userName = it.displayName
+            userId = it.uid
+            userPhotoUrl = it.photoUrl.toString()
+            println(tag+ "updateUserInfoToken: usuario $userName, id $userId, foto $userPhotoUrl")
+        } ?: run {
+            println("No hay usuario autenticado.")
+        }
     }
 
     private fun addUserWithDefaultMoney(userId: String) {
@@ -212,6 +218,38 @@ class GoogleAuthClient(
                     userRef.update("money", currentMoney + amount)
                         .addOnSuccessListener {
                             callback(currentMoney + amount)
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(tag, "Error updating user money", e)
+                            callback(null)
+                        }
+                } else {
+                    callback(null)
+                }
+            } else {
+                val moneyData = hashMapOf(
+                    "money" to 100
+                )
+                userRef.set(moneyData)
+                    .addOnSuccessListener { Log.d(tag, "User added with default money") }
+                    .addOnFailureListener { e -> Log.w(tag, "Error adding user", e) }
+                callback(null)
+            }
+        }.addOnFailureListener { e ->
+            Log.w(tag, "Error getting user money", e)
+            callback(null)
+        }
+    }
+
+    fun lostMoney(userId: String, amount: Int, callback: (Int?) -> Unit) {
+        val userRef = db.collection("totalMoney").document(userId)
+        userRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val currentMoney = document.getLong("money")?.toInt()
+                if (currentMoney != null) {
+                    userRef.update("money", currentMoney - amount)
+                        .addOnSuccessListener {
+                            callback(currentMoney - amount)
                         }
                         .addOnFailureListener { e ->
                             Log.w(tag, "Error updating user money", e)

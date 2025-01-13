@@ -137,8 +137,8 @@ fun LogIn(navController: NavHostController) {
         ) {
             Text(
                 text = "Log in",
-                color = Color.Black
-            )
+                color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+                )
         }
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -173,7 +173,9 @@ fun LogIn(navController: NavHostController) {
         }
         Spacer(modifier = Modifier.height(10.dp))
 
-        Text(text = "Don't have an account?")
+        Text(text = "Don't have an account?",
+            color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+            )
 
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -182,8 +184,8 @@ fun LogIn(navController: NavHostController) {
         }, colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)) {
             Text(
                 text = "Create one",
-                color = Color.Black
-            )
+                color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+                )
         }
     }
 }

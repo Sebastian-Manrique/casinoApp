@@ -29,7 +29,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -56,18 +55,46 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.proyectopmdm.GoogleAuthClient
 import com.example.proyectopmdm.ui.theme.BlueBotton
 import com.example.proyectopmdm.ui.theme.diceBlack
 import com.example.proyectopmdm.ui.theme.diceWhite
 import com.example.proyectopmdm.ui.theme.whiteSebas
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun Dice(navController: NavHostController) {
+    val contextForGoogle = LocalContext.current
+    val googleAuthClient = remember { GoogleAuthClient(contextForGoogle) }
     var resultNumber by remember { mutableIntStateOf(0) }
     val list = remember { mutableStateListOf<Int>() }
     var isExpanded by remember { mutableStateOf(false) } // The box is open or not
     var betNumber by remember { mutableIntStateOf(0) }
     var colorBet: Boolean? by remember { mutableStateOf(null) }
+    var moneyBet by remember { mutableStateOf("") } // Holds the input text
+
+    val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    fun onButtonClick() {
+        println("Cantidad apostada: $moneyBet, numero elegido: $betNumber")
+        if (moneyBet.isEmpty()) {
+            showToast(context, "You didn't bet any money!")
+        } else if (moneyBet.contains(".")) {
+            showToast(context, "It is not allowed to bet with cents 🤏")
+        } else if (moneyBet.contains(",")) {
+            showToast(context, "It is not allowed to bet with cents 🤏")
+        } else if (moneyBet.toInt() > money) {
+            showToast(context, "Liar, you don't have that money!")
+        } else if (moneyBet.toInt() < 0) {
+            showToast(context, "You can't bet negative money!")
+        } else if (betNumber == 0 && colorBet == null) {
+            showToast(context, "You didn't select any number or color!")
+        } else {
+            resultNumber = randomGenerator(list)
+            betFun(betNumber, moneyBet, context, resultNumber, colorBet, googleAuthClient)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -77,8 +104,6 @@ fun Dice(navController: NavHostController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val context = LocalContext.current
-
         Text("Choose your lucky number \uD83C\uDF40", fontSize = 20.sp)
 
         Spacer(Modifier.height(10.dp))
@@ -97,15 +122,22 @@ fun Dice(navController: NavHostController) {
 
         Spacer(Modifier.height(10.dp))
 
-        var moneyBet by remember { mutableStateOf("") } // Holds the input text
-        val keyboardController = LocalSoftwareKeyboardController.current
         TextField(
             value = moneyBet, // The current money value
             onValueChange = { newText -> moneyBet = newText }, // Update text when changed
-            label = { Text("Enter the amount") }, keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number, imeAction = ImeAction.Done
-            ), keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
+            label = { Text("Enter the amount") },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboardController?.hide()
+                    onButtonClick()
+                }
+            )
         )
+
         Spacer(Modifier.height(5.dp))
 
         Text("Currently money ${money}€", fontSize = 17.sp)
@@ -113,33 +145,13 @@ fun Dice(navController: NavHostController) {
         Spacer(Modifier.height(5.dp))
 
         Button(
-            onClick = {
-                println("Cantidad apostada: $moneyBet, numero elegido: $betNumber")
-                if (moneyBet.isEmpty()) {
-                    showToast(context, "You didn't bet any money!")
-                } else if (moneyBet.contains(".")) {
-                    showToast(context, "It is not allowed to bet with cents 🤏")
-                } else if (moneyBet.contains(",")) {
-                    showToast(context, "It is not allowed to bet with cents 🤏")
-                } else if (moneyBet.toInt() > money) {
-                    showToast(context, "Liar, you don't have that money!")
-                } else if (moneyBet.toInt() < 0) {
-                    showToast(context, "You can't bet negative money!")
-                } else if (betNumber == 0 && colorBet == null) {
-                    showToast(context, "You didn't select any number or color!")
-                } else {
-                    resultNumber = randomGenerator(list)
-                    betFun(betNumber, moneyBet, context, resultNumber, colorBet)
-                }
-            },
-            //No se puede simplificar el color.
+            onClick = { onButtonClick() },
             colors = ButtonDefaults.buttonColors(containerColor = BlueBotton)
         ) {
             Text("Roll the dices! 🎲")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
 
         Text(
             text = buildAnnotatedString {
@@ -188,7 +200,6 @@ fun Dice(navController: NavHostController) {
                             ) {
                                 Text(
                                     text = "Rolled: $item",
-                                    // modifier = Modifier.align(Alignment.CenterHorizontally), // Centrar el texto
                                     textAlign = TextAlign.Center, // Alinear el texto dentro del Text
                                     fontSize = 16.sp
                                 )
@@ -207,8 +218,11 @@ fun betFun(
     moneyBet: String,
     context: Context,
     resultNumber: Int,
-    colorBet: Boolean?
+    colorBet: Boolean?,
+    googleAuthClient: GoogleAuthClient
 ) {
+    val iniciado = FirebaseAuth.getInstance()
+    val userId = iniciado.currentUser?.uid
     println("betNumber == $betNumber, resultNumber == $resultNumber, colorBet == $colorBet")
     if (colorBet == null) {
         if (betNumber == 0) {
@@ -217,18 +231,42 @@ fun betFun(
         } else if (resultNumber == betNumber) {
             println("resultNumber == $resultNumber, betNumber == $betNumber")
             showToast(context, "You just earn money!! 💲🤑💸")
-            money += moneyBet.toInt() * 2
+            if (userId != null) {
+                googleAuthClient.setUserMoney(userId, moneyBet.toInt() * 2) { newMoney ->
+                    if (newMoney != null) {
+                        money = newMoney
+                    }
+                }
+            }
         } else {
             showToast(context, "You just lost money!! 😢")
-            money -= moneyBet.toInt()
+            if (userId != null) {
+                googleAuthClient.lostMoney(userId, moneyBet.toInt()) { newMoney ->
+                    if (newMoney != null) {
+                        money = newMoney
+                    }
+                }
+            }
         }
     } else {
         if ((resultNumber % 2 == 0 && colorBet) || (resultNumber % 2 == 1 && !colorBet)) { // Black is true, Red is false
             showToast(context, "You just earn money!! 💲🤑💸")
-            money += moneyBet.toInt() * 2
+            if (userId != null) {
+                googleAuthClient.setUserMoney(userId, moneyBet.toInt() * 2) { newMoney ->
+                    if (newMoney != null) {
+                        money = newMoney
+                    }
+                }
+            }
         } else {
             showToast(context, "You just lost money!! 😢")
-            money -= moneyBet.toInt()
+            if (userId != null) {
+                googleAuthClient.lostMoney(userId, moneyBet.toInt()) { newMoney ->
+                    if (newMoney != null) {
+                        money = newMoney
+                    }
+                }
+            }
         }
     }
 }

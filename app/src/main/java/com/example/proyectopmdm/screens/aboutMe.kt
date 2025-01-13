@@ -45,6 +45,7 @@ import com.example.proyectopmdm.R
 import com.example.proyectopmdm.Routes
 import com.example.proyectopmdm.ui.theme.buttonColorDefalt
 import com.example.proyectopmdm.ui.theme.whiteSebas
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,21 +54,10 @@ fun AboutMe(navController: NavHostController) {
     val coroutineScope = rememberCoroutineScope()
     val googleAuthClient = remember { GoogleAuthClient(context) }
     var isSingIn by rememberSaveable { mutableStateOf(googleAuthClient.isSignedIn()) }
-    var userName by rememberSaveable { mutableStateOf<String?>(null) }
-    var userId by rememberSaveable { mutableStateOf<String?>(null) }
-    var userPhotoUrl by rememberSaveable { mutableStateOf<String?>(null) }
-
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            userName = googleAuthClient.userName
-            userId = googleAuthClient.userId
-            userPhotoUrl = googleAuthClient.userPhotoUrl
-            println(
-                "GoogleSignInClient:AboutMe " + "User: $userName, ID: $userId" +
-                        ", Photo: $userPhotoUrl"
-            )
-        }
-    }
+    val iniciado = FirebaseAuth.getInstance()
+    val userName = iniciado.currentUser?.displayName
+    val userId = iniciado.currentUser?.uid
+    val userPhotoUrl = iniciado.currentUser?.photoUrl
 
     Column(
         modifier = Modifier
@@ -105,7 +95,7 @@ fun AboutMe(navController: NavHostController) {
         ) {
             Text(
                 "User:  $userName\n" +
-                        "ID: $userId\n",
+                        "ID: ${userId!!.takeLast(4)}\n",
                 color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
                 fontSize = 20.sp,
             )
@@ -113,7 +103,7 @@ fun AboutMe(navController: NavHostController) {
         Image(
             painter = rememberAsyncImagePainter("$userPhotoUrl"),
             contentDescription = "User Photo",
-            modifier = Modifier.size(50.dp)
+            modifier = Modifier.size(100.dp)
         )
 
         ColorTheme() //white or black theme color
@@ -143,7 +133,7 @@ fun AboutMe(navController: NavHostController) {
             "¿A qué tienes miedo de perder, si en realidad nada de lo que hay en el mundo te pertenece?\n" +
                     "\n~Marco Aurelio",
             fontFamily = fontBarras,
-            color = Color.Black,
+            color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
             fontSize = 20.sp,
             textAlign = TextAlign.Center,
         )

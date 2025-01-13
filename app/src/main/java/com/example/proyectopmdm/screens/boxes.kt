@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +47,7 @@ import com.example.proyectopmdm.R
 import com.example.proyectopmdm.ui.theme.blackSebas
 import com.example.proyectopmdm.ui.theme.buttonColorDefalt
 import com.example.proyectopmdm.ui.theme.whiteSebas
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 @Composable
@@ -95,53 +95,67 @@ fun AddMoneyBox(googleAuthClient: GoogleAuthClient) {
                     Button(
                         onClick = {
                             coroutineScope.launch {
-                                val userId = googleAuthClient.userId
+                                val iniciado = FirebaseAuth.getInstance()
+                                val userId = iniciado.currentUser?.uid
                                 if (userId != null) {
-                                    googleAuthClient.setUserMoney(userId, 10) { newMoney ->
+                                    googleAuthClient.setUserMoney(userId, 20) { newMoney ->
                                         if (newMoney != null) {
-//                                        money = newMoney
+                                            money = newMoney
                                         }
                                     }
                                 }
                             }
-                            money += 20
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)
                     ) {
-                        Text("20€")
+                        Text(
+                            "20€",
+                            color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+                        )
                     }
 
                     Button(
                         onClick = {
-                            googleAuthClient.userId?.let {
-                                googleAuthClient.setUserMoney(it, 60) { newMoney ->
-                                    if (newMoney != null) {
-//                                    money = newMoney
+                            coroutineScope.launch {
+                                val iniciado = FirebaseAuth.getInstance()
+                                val userId = iniciado.currentUser?.uid
+                                if (userId != null) {
+                                    googleAuthClient.setUserMoney(userId, 60) { newMoney ->
+                                        if (newMoney != null) {
+                                            money = newMoney
+                                        }
                                     }
                                 }
                             }
-                            money += 60
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)
                     ) {
-                        Text("60€")
+                        Text(
+                            "60€",
+                            color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+                        )
                     }
 
                     Button(
                         onClick = {
-                            println("User id: ${googleAuthClient.userId}")
-                            googleAuthClient.userId?.let {
-                                googleAuthClient.setUserMoney(it, 100) { newMoney ->
-                                    if (newMoney != null) {
-//                                    money = newMoney
+                            coroutineScope.launch {
+                                val iniciado = FirebaseAuth.getInstance()
+                                val userId = iniciado.currentUser?.uid
+                                if (userId != null) {
+                                    googleAuthClient.setUserMoney(userId, 100) { newMoney ->
+                                        if (newMoney != null) {
+                                            money = newMoney
+                                        }
                                     }
                                 }
                             }
-                            money += 100
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)
                     ) {
-                        Text("100€")
+                        Text(
+                            "100€",
+                            color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
+                        )
                     }
                 }
             }
@@ -238,7 +252,7 @@ val fontComic = FontFamily(Font(R.font.comicsans, FontWeight.Black))
 //Prizes boxes
 
 @Composable
-fun ZamazonBox() {
+fun ZamazonBox(googleAuthClient: GoogleAuthClient) {
     var zamazon by remember { mutableStateOf(true) } // The box is open or not
     val context = LocalContext.current
 
@@ -287,7 +301,7 @@ fun ZamazonBox() {
                     )
                     Button(
                         onClick = {
-                            checkMoney(context)
+                            checkMoney(context, googleAuthClient)
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)
                     ) {
@@ -303,17 +317,25 @@ fun ZamazonBox() {
     }
 }
 
-fun checkMoney(context: Context) {
+fun checkMoney(context: Context, googleAuthClient: GoogleAuthClient) {
+    val iniciado = FirebaseAuth.getInstance()
+    val userId = iniciado.currentUser?.uid
     if (money < 10) {
         showToast(context, "You don't have that money!")
     } else {
-        money -= 10
+        if (userId != null) {
+            googleAuthClient.lostMoney(userId, 10) { newMoney ->
+                if (newMoney != null) {
+                    money = newMoney
+                }
+            }
+        }
         showToast(context, "Actual money any $money €")
     }
 }
 
 @Composable
-fun PiePaxBox() {
+fun PiePaxBox(googleAuthClient: GoogleAuthClient) {
     var piePax by remember { mutableStateOf(true) } // The box is open or not
     val context = LocalContext.current
 
@@ -362,7 +384,7 @@ fun PiePaxBox() {
                     )
                     Button(
                         onClick = {
-                            checkMoney(context)
+                            checkMoney(context,googleAuthClient)
                         }, colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)
                     ) {
                         Text(
@@ -378,7 +400,7 @@ fun PiePaxBox() {
 }
 
 @Composable
-fun SthymBox() {
+fun SthymBox(googleAuthClient: GoogleAuthClient) {
     var sthym by remember { mutableStateOf(true) } // The box is open or not
     val context = LocalContext.current
 
@@ -429,7 +451,7 @@ fun SthymBox() {
 
                     Button(
                         onClick = {
-                            checkMoney(context)
+                            checkMoney(context,googleAuthClient)
                         }, colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)
 
                     ) {
@@ -447,14 +469,13 @@ fun SthymBox() {
 
 @Composable
 fun ColorTheme() {
-    var openOrNot by remember { mutableStateOf(false) } // The box is open or not
     var checkedButton by remember { mutableStateOf(false) } // The box is open or not
 
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(if (openOrNot) 160.dp else 70.dp)
+            .height(70.dp)
             .clip(
                 RoundedCornerShape(
                     topStart = 16.dp,
@@ -472,7 +493,6 @@ fun ColorTheme() {
                     bottomEnd = 16.dp
                 )
             )
-            .clickable { openOrNot = !openOrNot }
             .padding(10.dp), contentAlignment = Alignment.Center
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {

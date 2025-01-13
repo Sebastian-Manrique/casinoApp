@@ -39,6 +39,7 @@ import androidx.navigation.NavController
 import com.example.proyectopmdm.R
 import com.example.proyectopmdm.Routes
 import com.example.proyectopmdm.ui.theme.buttonColorDefalt
+import com.example.proyectopmdm.ui.theme.whiteSebas
 
 @Composable
 fun CreateUser(navController: NavController) {
@@ -60,6 +61,7 @@ fun CreateUser(navController: NavController) {
     ) {
         Text(
             text = "Spin to Win\nP.M.D.M.\nPrizes, Money, Dice & More",
+            color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
             textAlign = TextAlign.Center,
             fontSize = 30.sp
         )
@@ -147,7 +149,8 @@ fun CreateUser(navController: NavController) {
             }, colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)
         ) {
             Text(
-                text = "Log in", color = Color.Black
+                text = "Log in",
+                color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
             )
         }
     }
