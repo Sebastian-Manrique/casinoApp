@@ -2,38 +2,11 @@ package com.example.proyectopmdm
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
-import coil.compose.rememberAsyncImagePainter
-import com.example.proyectopmdm.screens.backgroundColor
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -53,7 +26,6 @@ class GoogleAuthClient(
     private val firebaseAuth = FirebaseAuth.getInstance()
 
     private val db = FirebaseFirestore.getInstance()
-
 
     var userName: String? = null
     var userId: String? = null
@@ -79,6 +51,7 @@ class GoogleAuthClient(
 
     suspend fun signIn(): Boolean {
         if (isSignedIn()) {
+            updateUserInfo() // Actualiza la información del usuario si ya está firmado
             return true
         }
 
@@ -137,7 +110,7 @@ class GoogleAuthClient(
                 val authResult = firebaseAuth.signInWithCredential(authCredential).await()
 
                 if (authResult.user != null) {
-                    updateUserInfoToken()
+                    updateUserInfo()
                     addUserWithDefaultMoney(authResult.user!!.uid)
                     return true
                 }
@@ -154,14 +127,14 @@ class GoogleAuthClient(
         return false
     }
 
-    private fun updateUserInfoToken() {
+    fun updateUserInfo() {
         val currentUser = firebaseAuth.currentUser
 
         currentUser?.let {
             userName = it.displayName
             userId = it.uid
             userPhotoUrl = it.photoUrl.toString()
-            println(tag+ "updateUserInfoToken: usuario $userName, id $userId, foto $userPhotoUrl")
+            println(tag + "updateUserInfo: usuario $userName, id $userId, foto $userPhotoUrl")
         } ?: run {
             println("No hay usuario autenticado.")
         }

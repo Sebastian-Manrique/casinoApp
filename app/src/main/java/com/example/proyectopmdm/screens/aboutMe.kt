@@ -54,10 +54,18 @@ fun AboutMe(navController: NavHostController) {
     val coroutineScope = rememberCoroutineScope()
     val googleAuthClient = remember { GoogleAuthClient(context) }
     var isSingIn by rememberSaveable { mutableStateOf(googleAuthClient.isSignedIn()) }
-    val iniciado = FirebaseAuth.getInstance()
-    val userName = iniciado.currentUser?.displayName
-    val userId = iniciado.currentUser?.uid
-    val userPhotoUrl = iniciado.currentUser?.photoUrl
+    var userName by remember { mutableStateOf<String?>(null) }
+    var userId by remember { mutableStateOf<String?>(null) }
+    var userPhotoUrl by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(isSingIn) {
+        if (isSingIn) {
+            googleAuthClient.updateUserInfo()
+            userName = googleAuthClient.userName
+            userId = googleAuthClient.userId
+            userPhotoUrl = googleAuthClient.userPhotoUrl
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -95,13 +103,13 @@ fun AboutMe(navController: NavHostController) {
         ) {
             Text(
                 "User:  $userName\n" +
-                        "ID: ${userId!!.takeLast(4)}\n",
+                        "ID: ${userId?.takeLast(4)}\n",
                 color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
-                fontSize = 20.sp,
+                fontSize = 15.sp,
             )
         }
         Image(
-            painter = rememberAsyncImagePainter("$userPhotoUrl"),
+            painter = rememberAsyncImagePainter(userPhotoUrl),
             contentDescription = "User Photo",
             modifier = Modifier.size(100.dp)
         )
@@ -123,7 +131,7 @@ fun AboutMe(navController: NavHostController) {
         ) {
             Text(
                 "Log out",
-                color = Color.Black
+                color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
             )
         }
 

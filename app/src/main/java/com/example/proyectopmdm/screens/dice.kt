@@ -29,12 +29,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -64,17 +67,25 @@ import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun Dice(navController: NavHostController) {
-    val contextForGoogle = LocalContext.current
-    val googleAuthClient = remember { GoogleAuthClient(contextForGoogle) }
+    val context = LocalContext.current
+    val googleAuthClient = remember { GoogleAuthClient(context) }
     var resultNumber by remember { mutableIntStateOf(0) }
     val list = remember { mutableStateListOf<Int>() }
     var isExpanded by remember { mutableStateOf(false) } // The box is open or not
     var betNumber by remember { mutableIntStateOf(0) }
     var colorBet: Boolean? by remember { mutableStateOf(null) }
     var moneyBet by remember { mutableStateOf("") } // Holds the input text
-
-    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    var userId by remember { mutableStateOf<String?>(null) }
+
+    val isSingIn by rememberSaveable { mutableStateOf(googleAuthClient.isSignedIn()) }
+
+    LaunchedEffect(isSingIn) {
+        if (isSingIn) {
+            googleAuthClient.updateUserInfo()
+            userId = googleAuthClient.userId
+        }
+    }
 
     fun onButtonClick() {
         println("Cantidad apostada: $moneyBet, numero elegido: $betNumber")
@@ -221,49 +232,47 @@ fun betFun(
     colorBet: Boolean?,
     googleAuthClient: GoogleAuthClient
 ) {
-    val iniciado = FirebaseAuth.getInstance()
-    val userId = iniciado.currentUser?.uid
+    val userId = FirebaseAuth.getInstance().currentUser?.uid
     println("betNumber == $betNumber, resultNumber == $resultNumber, colorBet == $colorBet")
+
     if (colorBet == null) {
-        if (betNumber == 0) {
-            Toast.makeText(context, "You didn't select any number!", Toast.LENGTH_SHORT)
-                .show()
-        } else if (resultNumber == betNumber) {
-            println("resultNumber == $resultNumber, betNumber == $betNumber")
-            showToast(context, "You just earn money!! 💲🤑💸")
-            if (userId != null) {
-                googleAuthClient.setUserMoney(userId, moneyBet.toInt() * 2) { newMoney ->
-                    if (newMoney != null) {
-                        money = newMoney
+        when {
+            betNumber == 0 -> {
+                Toast.makeText(context, "You didn't select any number!", Toast.LENGTH_SHORT).show()
+            }
+            resultNumber == betNumber -> {
+                println("resultNumber == $resultNumber, betNumber == $betNumber")
+                showToast(context, "You just earn money!! 💲🤑💸")
+                userId?.let {
+                    googleAuthClient.setUserMoney(it, moneyBet.toInt() * 2) { newMoney ->
+                        money = newMoney ?: return@setUserMoney
                     }
                 }
             }
-        } else {
-            showToast(context, "You just lost money!! 😢")
-            if (userId != null) {
-                googleAuthClient.lostMoney(userId, moneyBet.toInt()) { newMoney ->
-                    if (newMoney != null) {
-                        money = newMoney
+            else -> {
+                showToast(context, "You just lost money!! 😢")
+                userId?.let {
+                    googleAuthClient.lostMoney(it, moneyBet.toInt()) { newMoney ->
+                        money = newMoney ?: return@lostMoney
                     }
                 }
             }
         }
     } else {
-        if ((resultNumber % 2 == 0 && colorBet) || (resultNumber % 2 == 1 && !colorBet)) { // Black is true, Red is false
-            showToast(context, "You just earn money!! 💲🤑💸")
-            if (userId != null) {
-                googleAuthClient.setUserMoney(userId, moneyBet.toInt() * 2) { newMoney ->
-                    if (newMoney != null) {
-                        money = newMoney
+        when {
+            (resultNumber % 2 == 0 && colorBet) || (resultNumber % 2 == 1 && !colorBet) -> { // Black is true, Red is false
+                showToast(context, "You just earn money!! 💲🤑💸")
+                userId?.let {
+                    googleAuthClient.setUserMoney(it, moneyBet.toInt() * 2) { newMoney ->
+                        money = newMoney ?: return@setUserMoney
                     }
                 }
             }
-        } else {
-            showToast(context, "You just lost money!! 😢")
-            if (userId != null) {
-                googleAuthClient.lostMoney(userId, moneyBet.toInt()) { newMoney ->
-                    if (newMoney != null) {
-                        money = newMoney
+            else -> {
+                showToast(context, "You just lost money!! 😢")
+                userId?.let {
+                    googleAuthClient.lostMoney(it, moneyBet.toInt()) { newMoney ->
+                        money = newMoney ?: return@lostMoney
                     }
                 }
             }

@@ -252,13 +252,12 @@ val fontComic = FontFamily(Font(R.font.comicsans, FontWeight.Black))
 //Prizes boxes
 
 @Composable
-fun ZamazonBox(googleAuthClient: GoogleAuthClient) {
-    var zamazon by remember { mutableStateOf(true) } // The box is open or not
+fun ZamazonBox(googleAuthClient: GoogleAuthClient, userId: String?) {
     val context = LocalContext.current
 
     Box(
         modifier = Modifier
-            .height(if (zamazon) 160.dp else 100.dp)
+            .height(160.dp)
             .fillMaxWidth()
             .clip(
                 RoundedCornerShape(
@@ -281,45 +280,42 @@ fun ZamazonBox(googleAuthClient: GoogleAuthClient) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = if (zamazon) "Zamazon Gift Card €10" else "s",
+                text = "Zamazon Gift Card €10",
                 color = if (backgroundColor == whiteSebas) Color.Black else Color.White,
                 fontSize = 20.sp,
                 fontFamily = fontComic,
             )
-            if (zamazon) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.zamazon),
+                    contentDescription = "Zamazon",
+                    modifier = Modifier.size(100.dp)
+                )
+                Button(
+                    onClick = {
+                        checkMoney(context, googleAuthClient, userId)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.zamazon),
-                        contentDescription = "Zamazon",
-                        modifier = Modifier.size(100.dp)
+                    Text(
+                        "claim this Zamazon prize",
+                        color = Color.Black,
+                        fontFamily = fontComic,
                     )
-                    Button(
-                        onClick = {
-                            checkMoney(context, googleAuthClient)
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)
-                    ) {
-                        Text(
-                            "claim this Zamazon prize",
-                            color = Color.Black,
-                            fontFamily = fontComic,
-                        )
-                    }
                 }
             }
+
         }
     }
 }
 
-fun checkMoney(context: Context, googleAuthClient: GoogleAuthClient) {
-    val iniciado = FirebaseAuth.getInstance()
-    val userId = iniciado.currentUser?.uid
+fun checkMoney(context: Context, googleAuthClient: GoogleAuthClient, userId: String?) {
     if (money < 10) {
         showToast(context, "You don't have that money!")
     } else {
@@ -327,15 +323,15 @@ fun checkMoney(context: Context, googleAuthClient: GoogleAuthClient) {
             googleAuthClient.lostMoney(userId, 10) { newMoney ->
                 if (newMoney != null) {
                     money = newMoney
+                    showToast(context, "Actual money any $money €")
                 }
             }
         }
-        showToast(context, "Actual money any $money €")
     }
 }
 
 @Composable
-fun PiePaxBox(googleAuthClient: GoogleAuthClient) {
+fun PiePaxBox(googleAuthClient: GoogleAuthClient, userId: String?) {
     var piePax by remember { mutableStateOf(true) } // The box is open or not
     val context = LocalContext.current
 
@@ -384,7 +380,7 @@ fun PiePaxBox(googleAuthClient: GoogleAuthClient) {
                     )
                     Button(
                         onClick = {
-                            checkMoney(context,googleAuthClient)
+                            checkMoney(context, googleAuthClient, userId)
                         }, colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)
                     ) {
                         Text(
@@ -400,7 +396,7 @@ fun PiePaxBox(googleAuthClient: GoogleAuthClient) {
 }
 
 @Composable
-fun SthymBox(googleAuthClient: GoogleAuthClient) {
+fun SthymBox(googleAuthClient: GoogleAuthClient, userId: String?) {
     var sthym by remember { mutableStateOf(true) } // The box is open or not
     val context = LocalContext.current
 
@@ -451,7 +447,7 @@ fun SthymBox(googleAuthClient: GoogleAuthClient) {
 
                     Button(
                         onClick = {
-                            checkMoney(context,googleAuthClient)
+                            checkMoney(context, googleAuthClient, userId)
                         }, colors = ButtonDefaults.buttonColors(containerColor = buttonColorDefalt)
 
                     ) {
